@@ -44,39 +44,19 @@ option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/../allegro5/include
-    ${PROJECT_SOURCE_DIR}/../allegro5/addons/image
-    ${PROJECT_SOURCE_DIR}/../allegro5/addons/font
-    ${PROJECT_SOURCE_DIR}/../allegro5/addons/primitives
 )
-
-if(CMAKE_BUILD_TYPE STREQUAL Release)
-    link_directories(
-        ${PROJECT_SOURCE_DIR}/../allegro5/release/lib
-    )
-    list(APPEND LINK_LIBS allegro)
-    list(APPEND LINK_LIBS allegro_image)
-    list(APPEND LINK_LIBS allegro_font)
-    list(APPEND LINK_LIBS allegro_primitives)
-else()
-    link_directories(
-        ${PROJECT_SOURCE_DIR}/../allegro5/build/lib
-    )
-    list(APPEND LINK_LIBS allegro-debug)
-    list(APPEND LINK_LIBS allegro_image-debug)
-    list(APPEND LINK_LIBS allegro_font-debug)
-    list(APPEND LINK_LIBS allegro_primitives-debug)
-endif()
 
 set(CMAKE_C_FLAGS -Wall)
 
 # Find dependencies
 # =================
 
-#find_package(Allegro REQUIRED)
-#include_directories(${ALLEGRO_INCLUDE_DIR})
-#link_directories(${ALLEGRO_LINK_DIR})
-#list(APPEND LINK_LIBS ${ALLEGRO_LIBRARIES})
+find_package(Allegro REQUIRED)
+include_directories(${ALLEGRO_INCLUDE_DIR})
+list(APPEND LINK_LIBS ${ALLEGRO_LIBRARY})
+list(APPEND LINK_LIBS ${ALLEGRO_IMAGE_LIBRARY})
+list(APPEND LINK_LIBS ${ALLEGRO_FONT_LIBRARY})
+list(APPEND LINK_LIBS ${ALLEGRO_PRIMITIVES_LIBRARY})
 
 find_package(LIBXML2 REQUIRED)
 include_directories(${LIBXML2_INCLUDE_DIR})
@@ -100,6 +80,7 @@ list(APPEND NOSTOS_SRC_FILES
 list(APPEND NOSTOS_HDR_FILES
     ${PROJECT_SOURCE_DIR}/src/aabbtree.h
     ${PROJECT_SOURCE_DIR}/src/box.h
+    ${PROJECT_SOURCE_DIR}/src/screen.h
     ${PROJECT_SOURCE_DIR}/src/sprite.h
     ${PROJECT_SOURCE_DIR}/src/tiled.h
     ${PROJECT_SOURCE_DIR}/src/utils.h
