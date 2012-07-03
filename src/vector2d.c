@@ -7,6 +7,7 @@
 #include <math.h>
 #include <assert.h>
 
+#include "utils.h"
 
 VECTOR2D vadd (const VECTOR2D* v1, const VECTOR2D* v2)
 {

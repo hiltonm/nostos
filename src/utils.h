@@ -8,7 +8,7 @@
 #include <allegro5/allegro.h>
 #include <allegro5/internal/aintern_list.h>
 #include <allegro5/internal/aintern_vector.h>
-#include <allegro5/internal/aintern_aatree.h>
+#include "aatree.h"
 
 #define MIN(x,y) (((x) < (y)) ? (x) : (y))
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))

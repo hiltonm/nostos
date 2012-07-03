@@ -5,11 +5,6 @@
 #ifndef _tiled_h_
 #define _tiled_h_
 
-#include <allegro5/allegro.h>
-#include <allegro5/internal/aintern_list.h>
-#include <allegro5/internal/aintern_vector.h>
-#include <allegro5/internal/aintern_aatree.h>
-
 #include "utils.h"
 
 typedef struct TILED_MAP TILED_MAP;

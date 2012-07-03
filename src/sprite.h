@@ -5,10 +5,6 @@
 #ifndef _sprite_h_
 #define _sprite_h_
 
-#include <allegro5/allegro.h>
-#include <allegro5/internal/aintern_list.h>
-#include <allegro5/internal/aintern_aatree.h>
-
 #include "vector2d.h"
 #include "screen.h"
 #include "tiled.h"

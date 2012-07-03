@@ -6,9 +6,6 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
-#include <allegro5/internal/aintern_list.h>
-#include <allegro5/internal/aintern_vector.h>
-#include <allegro5/internal/aintern_aatree.h>
 
 #include <ctype.h>
 #include <string.h>
