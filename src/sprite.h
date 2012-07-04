@@ -49,17 +49,17 @@ typedef struct SPRITE_ANIMATION {
     int num_frames;
 } SPRITE_ANIMATION;
 
-typedef struct SPRITE_CHAR {
+typedef struct SPRITE {
     char *name;
     SPRITE_TILESET *tileset;
     SPRITE_ANIMATION animations[ANI_MAX];
     float duration;
     BOX box;
-} SPRITE_CHAR;
+} SPRITE;
 
 typedef struct SPRITE_ACTOR {
     EVENTS *event;
-    SPRITE_CHAR *schar;
+    SPRITE *sprite;
     int type;
     int current_animation;
     int current_frame;
@@ -86,7 +86,7 @@ typedef struct SPRITE_NPC {
 } SPRITE_NPC;
 
 typedef struct SPRITES {
-    _AL_AATREE *chars;
+    _AL_AATREE *sprites;
     _AL_AATREE *tilesets;
     _AL_LIST *strings;
 } SPRITES;

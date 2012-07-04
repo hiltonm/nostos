@@ -221,7 +221,8 @@ int main (int argc, char *argv[])
                 frame_time = new_time - current_time;
                 current_time = new_time;
 
-                times[i++ % NTIMES] = frame_time;
+                times[i] = frame_time;
+                i = (i + 1) % NTIMES;
 
                 mean_frame_time = 0.0;
                 for (int j = 0; j < NTIMES; j++)

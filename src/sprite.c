@@ -39,7 +39,7 @@ EVENTS default_sprite_events = {
 void sprite_free_sprites (SPRITES *sprites)
 {
     _al_list_destroy(sprites->strings);
-    _al_aa_free (sprites->chars);
+    _al_aa_free (sprites->sprites);
     _al_aa_free (sprites->tilesets);
     _al_list_destroy (sprites->strings);
     al_free (sprites);
@@ -55,16 +55,16 @@ static void dtor_tileset (void *value, void *user_data)
     al_free (tileset);
 }
 
-static void dtor_char (void *value, void *user_data)
+static void dtor_sprite (void *value, void *user_data)
 {
-    SPRITE_CHAR *schar = value;
-    al_free (schar->name);
+    SPRITE *sprite = value;
+    al_free (sprite->name);
 
     for (int i = 0; i < ANI_MAX; i++) {
-        al_free (schar->animations[i].frames);
+        al_free (sprite->animations[i].frames);
     }
 
-    al_free (schar);
+    al_free (sprite);
 }
 
 static void dtor_actor (void *value, void *user_data)
@@ -145,23 +145,23 @@ SPRITES* sprite_load_sprites (const char *filename)
             }
 
             sprites->tilesets = _al_aa_insert (sprites->tilesets, tileset->name, tileset, charcmp);
-        } else if (!strcmp (type, "char")) {
+        } else if (!strcmp (type, "sprite")) {
             item = _al_list_next (tokens, item);
-            SPRITE_CHAR *schar = al_malloc (sizeof (SPRITE_CHAR));
+            SPRITE *sprite = al_malloc (sizeof (SPRITE));
 
             const char *str = _al_list_item_data (item);
-            schar->name = strdup (str);
+            sprite->name = strdup (str);
             str = al_get_config_value (sprite_config, section, "tileset");
-            schar->tileset = _al_aa_search (sprites->tilesets, str, charcmp);
+            sprite->tileset = _al_aa_search (sprites->tilesets, str, charcmp);
 
             int duration = 100;
             get_config_i (sprite_config, section, "duration", &duration);
-            schar->duration = ALLEGRO_MSECS_TO_SECS (duration);
+            sprite->duration = ALLEGRO_MSECS_TO_SECS (duration);
 
             for (int i = 0; i < ANI_MAX; i++) {
                 str = al_get_config_value (sprite_config, section, config_animation_names[i]);
                 if (str) {
-                    SPRITE_ANIMATION *anim = &schar->animations[i];
+                    SPRITE_ANIMATION *anim = &sprite->animations[i];
                     anim->frames = get_int_array (str, &anim->num_frames);
                 }
             }
@@ -171,15 +171,15 @@ SPRITES* sprite_load_sprites (const char *filename)
                 int num = 0;
                 int *values = get_int_array (str, &num);
                 if (num == 4) {
-                    schar->box.center.x = values[0];
-                    schar->box.center.y = values[1];
-                    schar->box.extent.x = values[2];
-                    schar->box.extent.y = values[3];
+                    sprite->box.center.x = values[0];
+                    sprite->box.center.y = values[1];
+                    sprite->box.extent.x = values[2];
+                    sprite->box.extent.y = values[3];
                 }
                 al_free (values);
             }
 
-            sprites->chars = _al_aa_insert (sprites->chars, schar->name, schar, charcmp);
+            sprites->sprites = _al_aa_insert (sprites->sprites, sprite->name, sprite, charcmp);
         }
 
         section = al_get_next_config_section (&it);
@@ -215,21 +215,21 @@ SPRITE_ACTOR *sprite_init ()
     return actor;
 }
 
-SPRITE_ACTOR *sprite_init_actor (SPRITES *sprites, SPRITE_ACTOR *actor, const char *schar)
+SPRITE_ACTOR *sprite_init_actor (SPRITES *sprites, SPRITE_ACTOR *actor, const char *sprite)
 {
     assert (actor);
-    actor->schar = _al_aa_search (sprites->chars, schar, charcmp);
-    actor->box.extent.x = actor->schar->box.extent.x / 2.0;
-    actor->box.extent.y = actor->schar->box.extent.y / 2.0;
-    actor->box.center.x = actor->position.x + actor->schar->box.center.x;
-    actor->box.center.y = actor->position.y + actor->schar->box.center.y;
+    actor->sprite = _al_aa_search (sprites->sprites, sprite, charcmp);
+    actor->box.extent.x = actor->sprite->box.extent.x / 2.0;
+    actor->box.extent.y = actor->sprite->box.extent.y / 2.0;
+    actor->box.center.x = actor->position.x + actor->sprite->box.center.x;
+    actor->box.center.y = actor->position.y + actor->sprite->box.center.y;
     return actor;
 }
 
-SPRITE_ACTOR *sprite_new_actor (SPRITES *sprites, const char *schar)
+SPRITE_ACTOR *sprite_new_actor (SPRITES *sprites, const char *sprite)
 {
     SPRITE_ACTOR *actor = sprite_init ();
-    actor = sprite_init_actor (sprites, actor, schar);
+    actor = sprite_init_actor (sprites, actor, sprite);
     return actor;
 }
 
@@ -346,10 +346,10 @@ void sprite_update (SPRITE_ACTOR *actor, float dt, float t)
 
     if (previous_animation == actor->current_animation) {
         actor->current_duration += t;
-        if (actor->current_duration > actor->schar->duration) {
+        if (actor->current_duration > actor->sprite->duration) {
             actor->current_duration = 0.0;
             actor->current_frame = (actor->current_frame + 1) %
-                                    actor->schar->animations[actor->current_animation].num_frames;
+                                    actor->sprite->animations[actor->current_animation].num_frames;
         }
     } else {
         actor->current_duration = actor->current_frame = 0;
@@ -402,12 +402,12 @@ void sprite_draw (SPRITE_ACTOR *actor, SCREEN *screen)
 {
     int x = round (actor->position.x - screen->position.x) + 0.5;
     int y = round (actor->position.y - screen->position.y) + 0.5;
-    int w = actor->schar->tileset->tile_width;
-    int h = actor->schar->tileset->tile_height;
+    int w = actor->sprite->tileset->tile_width;
+    int h = actor->sprite->tileset->tile_height;
     float z = y / (float)screen->height;
 
-    SPRITE_ANIMATION *anim = &actor->schar->animations[actor->current_animation];
-    VECTOR2D *tile = &actor->schar->tileset->tiles[anim->frames[actor->current_frame]];
+    SPRITE_ANIMATION *anim = &actor->sprite->animations[actor->current_animation];
+    VECTOR2D *tile = &actor->sprite->tileset->tiles[anim->frames[actor->current_frame]];
     ALLEGRO_COLOR white = {255, 255, 255, 255};
     ALLEGRO_VERTEX v[] = {
         {.x = x,     .y = y,     .z = z, .u = tile->x,     .v = tile->y,     .color = white},
@@ -415,7 +415,7 @@ void sprite_draw (SPRITE_ACTOR *actor, SCREEN *screen)
         {.x = x + w, .y = y + h, .z = z, .u = tile->x + w, .v = tile->y + h, .color = white},
         {.x = x + w, .y = y,     .z = z, .u = tile->x + w, .v = tile->y,     .color = white},
     };
-    al_draw_prim (v, NULL, actor->schar->tileset->bitmap, 0, 4, ALLEGRO_PRIM_TRIANGLE_FAN);
+    al_draw_prim (v, NULL, actor->sprite->tileset->bitmap, 0, 4, ALLEGRO_PRIM_TRIANGLE_FAN);
     box_draw (&actor->box, screen, al_map_rgb_f (1, 1, 1));
 }
 
@@ -453,8 +453,8 @@ LIST *sprite_load_npcs (SPRITES *sprites, TILED_MAP *map, const char *layer_name
                     sprite_init_actor (sprites, &npc->actor, charstr);
                     npc->actor.position.x = npc->points[0];
                     npc->actor.position.y = npc->points[1];
-                    npc->actor.box.center.x = npc->points[0] + npc->actor.schar->box.center.x;
-                    npc->actor.box.center.y = npc->points[1] + npc->actor.schar->box.center.y;
+                    npc->actor.box.center.x = npc->points[0] + npc->actor.sprite->box.center.x;
+                    npc->actor.box.center.y = npc->points[1] + npc->actor.sprite->box.center.y;
                     npc->current_point = 0;
                     npc->paused = false;
                     npc->pause_duration = 3;
