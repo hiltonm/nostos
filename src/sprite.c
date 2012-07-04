@@ -7,6 +7,8 @@
 
 #include <allegro5/allegro_primitives.h>
 
+#include <math.h>
+
 #define NUM_ACTIONS 4
 
 const char * config_animation_names[ANI_MAX] = {
@@ -49,11 +51,6 @@ static void dtor_tileset (void *value, void *user_data)
     al_free (tileset->name);
     al_free (tileset->image_source);
     al_destroy_bitmap (tileset->bitmap);
-
-    for (int i=0; i<tileset->num_tiles; i++) {
-        al_destroy_bitmap (tileset->tiles[i]);
-    }
-
     al_free (tileset->tiles);
     al_free (tileset);
 }
@@ -131,20 +128,20 @@ SPRITES* sprite_load_sprites (const char *filename)
 
             ALLEGRO_PATH *image_path = al_create_path (tileset->image_source);
             al_rebase_path (respath, image_path);
+
             tileset->bitmap = al_load_bitmap (al_path_cstr (image_path, ALLEGRO_NATIVE_PATH_SEP));
+            if (!tileset->bitmap)
+                debug ("Failed to load sprite tileset bitmap: %s", name);
+
             al_destroy_path (image_path);
 
             int tiles_per_row = al_get_bitmap_width (tileset->bitmap) / tileset->tile_width;
             tileset->num_tiles = (al_get_bitmap_width (tileset->bitmap) * al_get_bitmap_height (tileset->bitmap)) /
                                  (tileset->tile_width * tileset->tile_height);
-            tileset->tiles = al_malloc (tileset->num_tiles * sizeof (ALLEGRO_BITMAP *));
+            tileset->tiles = al_malloc (tileset->num_tiles * sizeof (VECTOR2D));
             for (int i = 0; i < tileset->num_tiles; i++) {
-                ALLEGRO_BITMAP **tile = &tileset->tiles[i];
-                int x = (i % tiles_per_row) * tileset->tile_width;
-                int y = (i / tiles_per_row) * tileset->tile_height;
-                *tile = al_create_sub_bitmap(tileset->bitmap, x, y,
-                                             tileset->tile_width,
-                                             tileset->tile_height);
+                tileset->tiles[i].x = (i % tiles_per_row) * tileset->tile_width;
+                tileset->tiles[i].y = (i / tiles_per_row) * tileset->tile_height;
             }
 
             sprites->tilesets = _al_aa_insert (sprites->tilesets, tileset->name, tileset, charcmp);
@@ -403,10 +400,22 @@ void sprite_update (SPRITE_ACTOR *actor, float dt, float t)
 
 void sprite_draw (SPRITE_ACTOR *actor, SCREEN *screen)
 {
-    float sx = screen->position.x, sy = screen->position.y;
+    int x = round (actor->position.x - screen->position.x) + 0.5;
+    int y = round (actor->position.y - screen->position.y) + 0.5;
+    int w = actor->schar->tileset->tile_width;
+    int h = actor->schar->tileset->tile_height;
+    float z = y / (float)screen->height;
+
     SPRITE_ANIMATION *anim = &actor->schar->animations[actor->current_animation];
-    ALLEGRO_BITMAP *bitmap = actor->schar->tileset->tiles[anim->frames[actor->current_frame]];
-    al_draw_bitmap (bitmap, actor->position.x - sx, actor->position.y - sy, 0);
+    VECTOR2D *tile = &actor->schar->tileset->tiles[anim->frames[actor->current_frame]];
+    ALLEGRO_COLOR white = {255, 255, 255, 255};
+    ALLEGRO_VERTEX v[] = {
+        {.x = x,     .y = y,     .z = z, .u = tile->x,     .v = tile->y,     .color = white},
+        {.x = x,     .y = y + h, .z = z, .u = tile->x,     .v = tile->y + h, .color = white},
+        {.x = x + w, .y = y + h, .z = z, .u = tile->x + w, .v = tile->y + h, .color = white},
+        {.x = x + w, .y = y,     .z = z, .u = tile->x + w, .v = tile->y,     .color = white},
+    };
+    al_draw_prim (v, NULL, actor->schar->tileset->bitmap, 0, 4, ALLEGRO_PRIM_TRIANGLE_FAN);
     box_draw (&actor->box, screen, al_map_rgb_f (1, 1, 1));
 }
 

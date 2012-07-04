@@ -40,7 +40,7 @@ typedef struct SPRITE_TILESET {
     char *image_source;
     ALLEGRO_BITMAP *bitmap;
     int tile_width, tile_height;
-    ALLEGRO_BITMAP **tiles;
+    VECTOR2D *tiles;
     int num_tiles;
 } SPRITE_TILESET;
 

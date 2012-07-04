@@ -104,6 +104,7 @@ int main (int argc, char *argv[])
         flags |= ALLEGRO_WINDOWED;
 
     al_set_new_display_option (ALLEGRO_VSYNC, suggest_vsync, ALLEGRO_SUGGEST);
+    al_set_new_display_option (ALLEGRO_DEPTH_SIZE, 8, ALLEGRO_SUGGEST);
 
     al_set_new_display_flags (flags);
     al_set_new_display_refresh_rate (rrate);
@@ -166,21 +167,31 @@ int main (int argc, char *argv[])
 
     current_time = al_get_time ();
 
+    al_set_render_state (ALLEGRO_ALPHA_FUNCTION, ALLEGRO_RENDER_EQUAL);
+    al_set_render_state (ALLEGRO_ALPHA_TEST_VALUE, 1);
+
     while (running) {
-        al_rest (0.0001);
         ALLEGRO_EVENT event;
         if (redraw) {
+            al_clear_depth_buffer (0);
             tiled_draw_map_back (map, screen.position.x, screen.position.y, screen.width, screen.height, 0, 0, 0);
 
             al_draw_textf (font, al_map_rgba_f (0.9, 0, 0, 1), 5, 5, 0, "FPS: %.2f", curfps);
-            sprite_draw (actor, &screen);
 
+            al_set_render_state (ALLEGRO_ALPHA_TEST, true);
+            al_set_render_state (ALLEGRO_DEPTH_TEST, true);
+            al_set_render_state (ALLEGRO_DEPTH_FUNCTION, ALLEGRO_RENDER_GREATER);
+            al_hold_bitmap_drawing (true);
+            sprite_draw (actor, &screen);
             LIST_ITEM *item = _al_list_front (npcs);
             while (item) {
                 SPRITE_ACTOR *npc_actor = (SPRITE_ACTOR *)_al_list_item_data (item);
                 sprite_draw (npc_actor, &screen);
                 item = _al_list_next (npcs, item);
             }
+            al_hold_bitmap_drawing (false);
+            al_set_render_state (ALLEGRO_DEPTH_TEST, false);
+            al_set_render_state (ALLEGRO_ALPHA_TEST, false);
 
             if (false) {
                 item = _al_list_front (collisions.boxes);
