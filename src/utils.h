@@ -45,4 +45,7 @@ void dtor_string (void *value, void *user_data);
 
 LIST * split (const char *str, const char *delimiters);
 
+ALLEGRO_PATH* get_resource_path (const char *filename);
+char* get_resource_path_str (const char *filename);
+
 #endif

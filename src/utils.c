@@ -91,3 +91,21 @@ LIST * split (const char *str, const char *delimiters)
     return tokens;
 }
 
+ALLEGRO_PATH* get_resource_path (const char *filename)
+{
+    ALLEGRO_PATH *respath = al_get_standard_path (ALLEGRO_RESOURCES_PATH);
+    ALLEGRO_PATH *path = al_create_path (filename);
+    al_rebase_path (respath, path);
+    al_destroy_path (respath);
+    return path;
+}
+
+char* get_resource_path_str (const char *filename)
+{
+    ALLEGRO_PATH *path = get_resource_path (filename);
+    char *path_str = strdup (al_path_cstr (path, ALLEGRO_NATIVE_PATH_SEP));
+    al_destroy_path (path);
+    debug (path_str);
+    return path_str;
+}
+
