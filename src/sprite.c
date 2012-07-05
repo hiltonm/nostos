@@ -107,7 +107,6 @@ SPRITES* sprite_load_sprites (const char *filename)
 
     ALLEGRO_CONFIG_SECTION *it = NULL;
     const char *section = al_get_first_config_section (sprite_config, &it);
-    ALLEGRO_PATH *respath = al_get_standard_path (ALLEGRO_RESOURCES_PATH);
 
     SPRITES *sprites = al_calloc (1, sizeof (SPRITES));
 
@@ -126,14 +125,12 @@ SPRITES* sprite_load_sprites (const char *filename)
             get_config_i (sprite_config, section, "width", &tileset->tile_width);
             get_config_i (sprite_config, section, "height", &tileset->tile_height);
 
-            ALLEGRO_PATH *image_path = al_create_path (tileset->image_source);
-            al_rebase_path (respath, image_path);
-
-            tileset->bitmap = al_load_bitmap (al_path_cstr (image_path, ALLEGRO_NATIVE_PATH_SEP));
+            char *image_path = get_resource_path_str (tileset->image_source);
+            tileset->bitmap = al_load_bitmap (image_path);
             if (!tileset->bitmap)
                 debug ("Failed to load sprite tileset bitmap: %s", name);
 
-            al_destroy_path (image_path);
+            al_free (image_path);
 
             int tiles_per_row = al_get_bitmap_width (tileset->bitmap) / tileset->tile_width;
             tileset->num_tiles = (al_get_bitmap_width (tileset->bitmap) * al_get_bitmap_height (tileset->bitmap)) /
@@ -185,7 +182,6 @@ SPRITES* sprite_load_sprites (const char *filename)
         section = al_get_next_config_section (&it);
     } while (section);
 
-    al_destroy_path (respath);
     al_destroy_config (sprite_config);
     return sprites;
 }
