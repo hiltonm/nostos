@@ -457,6 +457,7 @@ TILED_MAP* tiled_load_tmx_file (const char *filename)
 
                 cobj->x = px;
                 cobj->y = py;
+                cobj->name = get_str (object_node, "name");
                 cobj->type_str = get_str (object_node, "type");
                 cobj->properties = get_properties (object_node, map);
 

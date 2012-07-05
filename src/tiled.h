@@ -60,6 +60,7 @@ struct TILED_MAP {
 };
 
 struct TILED_OBJECT {
+    char *name;
     int x, y;
     int type;
     char *type_str;
