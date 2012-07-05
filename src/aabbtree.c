@@ -337,10 +337,11 @@ AABB_TREE *aabb_load_tree (TILED_MAP *map, const char *layer_name)
                     object_rect = (TILED_OBJECT_RECT *)object;
                     boxes[i].extent = (VECTOR2D){object_rect->width / 2.0, object_rect->height / 2.0};
                     boxes[i].center = (VECTOR2D){boxes[i].extent.x + object->x, boxes[i].extent.y + object->y};
+                    boxes[i].data = object_rect;
                     i++;
                     break;
                 default:
-                    debug ("FIX: Found unsupported object in collisions layer. Only rectangles are supported.");
+                    debug ("FIX: Found unsupported object in box layer. Only rectangles are supported.");
                     break;
             }
             item = _al_list_next (layer->objects, item);

@@ -13,6 +13,7 @@
 typedef struct BOX {
     VECTOR2D center;
     VECTOR2D extent;
+    void *data;
 } BOX;
 
 BOX box_from_points (VECTOR2D v1, VECTOR2D v2);
