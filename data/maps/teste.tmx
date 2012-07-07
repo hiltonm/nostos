@@ -70062,42 +70062,42 @@
   <object x="736" y="1088">
    <properties>
     <property name="action" value="move"/>
-    <property name="char" value="female"/>
+    <property name="char" value="soldier"/>
    </properties>
    <polyline points="0,0 0,160 384,160 384,-32"/>
   </object>
   <object x="160" y="448">
    <properties>
     <property name="action" value="moverandom"/>
-    <property name="char" value="female"/>
+    <property name="char" value="bat"/>
    </properties>
    <polyline points="0,0 71,176 112,54 215,201 323,71 456,141 482,-15 319,191 122,178 -30,123"/>
   </object>
   <object x="800" y="160">
    <properties>
     <property name="action" value="move"/>
-    <property name="char" value="female"/>
+    <property name="char" value="soldier"/>
    </properties>
    <polyline points="0,0 256,192"/>
   </object>
   <object x="1696" y="416">
    <properties>
     <property name="action" value="move"/>
-    <property name="char" value="female"/>
+    <property name="char" value="soldier"/>
    </properties>
    <polyline points="0,0 0,128 32,288 -64,320 -160,416"/>
   </object>
   <object x="880" y="872">
    <properties>
     <property name="action" value="move"/>
-    <property name="char" value="female"/>
+    <property name="char" value="soldier"/>
    </properties>
    <polyline points="0,0 -1,70 377,69 427,21 529,13 673,-103 674,-176"/>
   </object>
   <object x="1158" y="802">
    <properties>
     <property name="action" value="moverandom"/>
-    <property name="char" value="female"/>
+    <property name="char" value="bee"/>
    </properties>
    <polyline points="0,0 96,-64 224,-32 160,96 192,224 128,288 96,160 352,192 256,96 256,320 64,64 160,-96"/>
   </object>
