@@ -62,3 +62,12 @@ void screen_update (SCREEN *screen, VECTOR2D focus, TILED_MAP *map, float dt)
     screen->position.x = CLAMP (0, round (screen->position.x), map->width * map->tile_width - screen->width);
     screen->position.y = CLAMP (0, round (screen->position.y), map->height * map->tile_height - screen->height);
 }
+
+void screen_center (SCREEN *screen, VECTOR2D focus, TILED_MAP *map)
+{
+    screen->position.x = focus.x - screen->width * 0.5f;
+    screen->position.y = focus.y - screen->height * 0.5f;
+    screen->position.x = CLAMP (0, round (screen->position.x), map->width * map->tile_width - screen->width);
+    screen->position.y = CLAMP (0, round (screen->position.y), map->height * map->tile_height - screen->height);
+}
+

@@ -153,6 +153,7 @@ GAME * game_init ()
 
     filename = get_resource_path_str ("data/scenes.ini");
     SCENES *scenes = scene_load_file (filename);
+    scene_load_scenes (scenes, sprites);
     al_free (filename);
 
     filename = get_resource_path_str ("data/entry.ini");
@@ -160,17 +161,17 @@ GAME * game_init ()
 
     const char *str = al_get_config_value (config, "", "scene");
     game->current_scene = scene_get (scenes, str);
-    game->current_scene = scene_load (game->current_scene, sprites);
+
     str = al_get_config_value (config, "", "actor");
     game->current_actor = sprite_new_actor (sprites, str);
+    str = al_get_config_value (config, "", "portal");
+    SCENE_PORTAL *portal = _al_aa_search (scenes->portals, str, charcmp);
 
     al_free (filename);
     al_destroy_config (config);
 
-    game->current_actor->position.x += 130;
-    game->current_actor->position.y += 240;
-    game->current_actor->box.center.x += 130;
-    game->current_actor->box.center.y += 240;
+    sprite_center (game->current_actor, &portal->position);
+    screen_center (&game->screen, portal->position, game->current_scene->map);
 
     return game;
 }

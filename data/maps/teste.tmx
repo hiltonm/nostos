@@ -70138,20 +70138,20 @@
  <objectgroup name="portal" width="100" height="100">
   <object name="in_02" x="864" y="768" width="32" height="32">
    <properties>
-    <property name="goto" value="house2"/>
+    <property name="portal" value="out_01"/>
    </properties>
   </object>
   <object name="out_02" x="864" y="800" width="32" height="32"/>
   <object name="in_03" x="1536" y="608" width="32" height="32">
    <properties>
-    <property name="goto" value="house01"/>
+    <property name="portal" value="out_02"/>
    </properties>
   </object>
   <object name="out_03" x="1536" y="640" width="32" height="32"/>
-  <object name="entry" x="512" y="256" width="32" height="32"/>
+  <object name="entry" x="672" y="1152" width="32" height="32"/>
   <object name="in_01" x="352" y="320" width="32" height="32">
    <properties>
-    <property name="goto" value="house01"/>
+    <property name="portal" value="out_03"/>
    </properties>
   </object>
   <object name="out_01" x="352" y="352" width="32" height="32"/>

@@ -23,5 +23,6 @@ typedef struct SCREEN {
 SCREEN screen_new ();
 void screen_update_size (SCREEN *screen, int width, int height);
 void screen_update (SCREEN *screen, VECTOR2D focus, TILED_MAP *map, float dt);
+void screen_center (SCREEN *screen, VECTOR2D focus, TILED_MAP *map);
 
 #endif

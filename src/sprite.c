@@ -215,10 +215,8 @@ SPRITE_ACTOR *sprite_init_actor (SPRITES *sprites, SPRITE_ACTOR *actor, const ch
 {
     assert (actor);
     actor->sprite = _al_aa_search (sprites->sprites, sprite, charcmp);
-    actor->box.extent.x = actor->sprite->box.extent.x / 2.0;
-    actor->box.extent.y = actor->sprite->box.extent.y / 2.0;
-    actor->box.center.x = actor->position.x + actor->sprite->box.center.x;
-    actor->box.center.y = actor->position.y + actor->sprite->box.center.y;
+    actor->box.extent = vdivf (&actor->sprite->box.extent, 2.0);
+    actor->box.center = vadd (&actor->position, &actor->sprite->box.center);
     return actor;
 }
 
@@ -481,5 +479,13 @@ LIST *sprite_load_npcs (SPRITES *sprites, TILED_MAP *map, const char *layer_name
     }
 
     return npcs;
+}
+
+void sprite_center (SPRITE_ACTOR *actor, VECTOR2D *v)
+{
+    actor->position = *v;
+    VECTOR2D dim = {actor->sprite->tileset->tile_width * 0.5f, actor->sprite->tileset->tile_height * 0.5f};
+    vatsub (&actor->position, &dim);
+    actor->box.center = vadd (&actor->position, &actor->sprite->box.center);
 }
 

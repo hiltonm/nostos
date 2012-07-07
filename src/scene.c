@@ -55,7 +55,7 @@ SCENE *scene_get (SCENES *scenes, const char *scene_name)
     return _al_aa_search (scenes->tree, scene_name, charcmp);
 }
 
-SCENE *scene_load (SCENE *scene, SPRITES *sprites)
+SCENE *scene_load (SCENE *scene, SCENES *scenes, SPRITES *sprites)
 {
     assert (scene);
     assert (sprites);
@@ -73,7 +73,61 @@ SCENE *scene_load (SCENE *scene, SPRITES *sprites)
     layer_name = scene->portal_layer_name ? scene->portal_layer_name : "portal";
     scene->portal_tree = aabb_load_tree (scene->map, layer_name);
 
+    scene_load_portals (scene, scenes, layer_name);
+
     return scene;
+}
+
+void scene_load_scenes (SCENES *scenes, SPRITES *sprites)
+{
+    assert (scenes);
+
+    LIST_ITEM *item = _al_list_front (scenes->scenes);
+    while (item) {
+        SCENE *scene = _al_list_item_data (item);
+        scene_load (scene, scenes, sprites);
+        item = _al_list_next (scenes->scenes, item);
+    }
+}
+
+SCENE_PORTAL *scene_get_portal (SCENES *scenes, const char *portal_name)
+{
+    return _al_aa_search (scenes->portals, portal_name, charcmp);
+}
+
+void scene_load_portals (SCENE *scene, SCENES *scenes, const char *layer_name)
+{
+    TILED_LAYER_OBJECT *layer = (TILED_LAYER_OBJECT *)tiled_layer_by_name (scene->map, layer_name);
+
+    if (layer && layer->objects) {
+        SCENE_PORTAL *portal;
+        LIST_ITEM *item = _al_list_front (layer->objects);
+        scene->portals = _al_list_create_static (_al_list_size (layer->objects));
+
+        while (item) {
+            TILED_OBJECT *object = _al_list_item_data (item);
+            switch (object->type) {
+                TILED_OBJECT_RECT *object_rect;
+                case OBJECT_TYPE_RECT:
+                    object_rect = (TILED_OBJECT_RECT *)object;
+                    portal = al_malloc (sizeof (SCENE_PORTAL));
+
+                    portal->name = object->name;
+                    portal->scene = scene;
+                    char *str = _al_aa_search (object->properties, "portal", charcmp);
+                    portal->destiny_portal = str;
+                    portal->position = (VECTOR2D){object_rect->width / 2.0 + object->x,
+                                                  object_rect->height / 2.0 + object->y};
+                    scenes->portals = _al_aa_insert (scenes->portals, portal->name, portal, charcmp);
+
+                    break;
+                default:
+                    debug ("FIX: Found unsupported object in box layer. Only rectangles are supported.");
+                    break;
+            }
+            item = _al_list_next (layer->objects, item);
+        }
+    }
 }
 
 SCENE *scene_unload (SCENE *scene)

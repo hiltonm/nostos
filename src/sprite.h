@@ -100,5 +100,6 @@ void sprite_draw (SPRITE_ACTOR *actor, SCREEN *screen);
 SPRITE_ACTOR *sprite_new_actor (SPRITES *sprites, const char *filename);
 SPRITES *sprite_load_sprites (const char *filename);
 LIST *sprite_load_npcs (SPRITES *sprites, TILED_MAP *map, const char *layer_name);
+void sprite_center (SPRITE_ACTOR *actor, VECTOR2D *v);
 
 #endif
