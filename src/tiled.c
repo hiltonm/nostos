@@ -256,6 +256,9 @@ TILED_MAP* tiled_load_tmx_file (const char *filename)
     xmlNode *root;
     char *str;
 
+    if (!filename)
+        return NULL;
+
     LIBXML_TEST_VERSION
 
     doc = xmlReadFile (filename, NULL, 0);

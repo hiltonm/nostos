@@ -147,6 +147,31 @@ GAME * game_init ()
     al_set_render_state (ALLEGRO_ALPHA_FUNCTION, ALLEGRO_RENDER_EQUAL);
     al_set_render_state (ALLEGRO_ALPHA_TEST_VALUE, 1);
 
+    char *filename = get_resource_path_str ("data/chars.ini");
+    SPRITES *sprites = sprite_load_sprites (filename);
+    al_free (filename);
+
+    filename = get_resource_path_str ("data/scenes.ini");
+    SCENES *scenes = scene_load_file (filename);
+    al_free (filename);
+
+    filename = get_resource_path_str ("data/entry.ini");
+    ALLEGRO_CONFIG *config = al_load_config_file (filename);
+
+    const char *str = al_get_config_value (config, "", "scene");
+    game->current_scene = scene_get (scenes, str);
+    game->current_scene = scene_load (game->current_scene, sprites);
+    str = al_get_config_value (config, "", "actor");
+    game->current_actor = sprite_new_actor (sprites, str);
+
+    al_free (filename);
+    al_destroy_config (config);
+
+    game->current_actor->position.x += 130;
+    game->current_actor->position.y += 240;
+    game->current_actor->box.center.x += 130;
+    game->current_actor->box.center.y += 240;
+
     return game;
 }
 
@@ -158,31 +183,10 @@ void game_loop (GAME *game)
     ALLEGRO_KEYBOARD_STATE keyboard_state;
     ALLEGRO_EVENT event;
     ALLEGRO_FONT *font = al_load_font ("data/fixed_font.tga", 0, 0);
+    SCENE *scene;
+    SPRITE_ACTOR *actor;
 
-    TILED_MAP *map;
-
-    ALLEGRO_PATH *respath = al_get_standard_path (ALLEGRO_RESOURCES_PATH);
-    ALLEGRO_PATH *mappath = al_clone_path (respath);
-    ALLEGRO_PATH *mapfilepath = al_create_path ("data/maps/teste.tmx");
-    al_join_paths (mappath, mapfilepath);
-    map = tiled_load_tmx_file (al_path_cstr (mappath, ALLEGRO_NATIVE_PATH_SEP));
-
-    al_destroy_path (mappath);
-    al_destroy_path (mapfilepath);
-    al_destroy_path (respath);
-
-    SPRITES *sprites = sprite_load_sprites ("data/chars.ini");
-    game->current_actor = sprite_new_actor (sprites, "female");
-    game->current_actor->position.x += 130;
-    game->current_actor->position.y += 240;
-    game->current_actor->box.center.x += 130;
-    game->current_actor->box.center.y += 240;
-
-    LIST *npcs = sprite_load_npcs (sprites, map, "npcs");
-    AABB_TREE *collision_tree = aabb_load_tree (map, "collisions");
-    //collision_tree->use_cache = true;
     AABB_COLLISIONS collisions;
-
     aabb_init_collisions (&collisions);
 
     int i = 0;
@@ -197,25 +201,30 @@ void game_loop (GAME *game)
     al_start_timer (game->timer);
 
     while (game->running) {
+        scene = game->current_scene;
+        actor = game->current_actor;
+
         if (redraw) {
             al_clear_depth_buffer (0);
-            tiled_draw_map_back (map, game->screen.position.x, game->screen.position.y,
-                                 game->screen.width, game->screen.height, 0, 0, 0);
+            tiled_draw_map_back (scene->map, game->screen.position.x, game->screen.position.y,
+                                             game->screen.width, game->screen.height, 0, 0, 0);
 
             al_draw_textf (font, al_map_rgba_f (0.9, 0, 0, 1), 5, 5, 0, "FPS: %.2f", curfps);
 
             al_set_render_state (ALLEGRO_ALPHA_TEST, true);
             al_set_render_state (ALLEGRO_DEPTH_TEST, true);
             al_set_render_state (ALLEGRO_DEPTH_FUNCTION, ALLEGRO_RENDER_GREATER);
+
             al_hold_bitmap_drawing (true);
-            sprite_draw (game->current_actor, &game->screen);
-            LIST_ITEM *item = _al_list_front (npcs);
+            sprite_draw (actor, &game->screen);
+            LIST_ITEM *item = _al_list_front (scene->npcs);
             while (item) {
                 SPRITE_ACTOR *npc_actor = (SPRITE_ACTOR *)_al_list_item_data (item);
                 sprite_draw (npc_actor, &game->screen);
-                item = _al_list_next (npcs, item);
+                item = _al_list_next (scene->npcs, item);
             }
             al_hold_bitmap_drawing (false);
+
             al_set_render_state (ALLEGRO_DEPTH_TEST, false);
             al_set_render_state (ALLEGRO_ALPHA_TEST, false);
 
@@ -227,11 +236,11 @@ void game_loop (GAME *game)
                     item = _al_list_next (collisions.boxes, item);
                 }
 
-                aabb_draw (collision_tree, &game->screen, al_map_rgb_f (0, 0, 1));
+                aabb_draw (scene->collision_tree, &game->screen, al_map_rgb_f (0, 0, 1));
             }
 
-            tiled_draw_map_fore (map, game->screen.position.x, game->screen.position.y,
-                                      game->screen.width, game->screen.height, 0, 0, 0);
+            tiled_draw_map_fore (scene->map, game->screen.position.x, game->screen.position.y,
+                                             game->screen.width, game->screen.height, 0, 0, 0);
 
             if (game->force_vsync)
                 al_wait_for_vsync ();
@@ -268,41 +277,42 @@ void game_loop (GAME *game)
                 }
 
                 if (al_key_down (&keyboard_state, ALLEGRO_KEY_RIGHT)) {
-                    game->current_actor->event->move_right (game->current_actor, dt);
+                    actor->event->move_right (actor, dt);
                 }
                 if (al_key_down (&keyboard_state, ALLEGRO_KEY_LEFT)) {
-                    game->current_actor->event->move_left (game->current_actor, dt);
+                    actor->event->move_left (actor, dt);
                 }
                 if (al_key_down (&keyboard_state, ALLEGRO_KEY_UP)) {
-                    game->current_actor->event->move_up (game->current_actor, dt);
+                    actor->event->move_up (actor, dt);
                 }
                 if (al_key_down (&keyboard_state, ALLEGRO_KEY_DOWN)) {
-                    game->current_actor->event->move_down (game->current_actor, dt);
+                    actor->event->move_down (actor, dt);
                 }
 
-                BOX box = game->current_actor->box;
-                box.center.x += game->current_actor->movement.x * dt;
-                box.center.y += game->current_actor->movement.y * dt;
-                aabb_collide_fill_cache (collision_tree, &box, &collisions);
-                if (collision_tree->num_collisions > 0) {
+                BOX box = actor->box;
+                box.center.x += actor->movement.x * dt;
+                box.center.y += actor->movement.y * dt;
+
+                aabb_collide_fill_cache (scene->collision_tree, &box, &collisions);
+                if (scene->collision_tree->num_collisions > 0) {
                     LIST_ITEM *item = _al_list_front (collisions.boxes);
                     while (item) {
-                        if (box_lateral ((BOX *)_al_list_item_data (item), &game->current_actor->box))
-                            game->current_actor->movement.x = 0;
+                        if (box_lateral ((BOX *)_al_list_item_data (item), &actor->box))
+                            actor->movement.x = 0;
                         else
-                            game->current_actor->movement.y = 0;
+                            actor->movement.y = 0;
                         item = _al_list_next (collisions.boxes, item);
                     }
                 }
 
-                screen_update (&game->screen, game->current_actor->position, map, dt);
-                sprite_update (game->current_actor, dt, mean_frame_time);
+                screen_update (&game->screen, actor->position, scene->map, dt);
+                sprite_update (actor, dt, mean_frame_time);
 
-                LIST_ITEM *item = _al_list_front (npcs);
+                LIST_ITEM *item = _al_list_front (scene->npcs);
                 while (item) {
                     SPRITE_ACTOR *npc_actor = (SPRITE_ACTOR *)_al_list_item_data (item);
                     sprite_update (npc_actor, dt, mean_frame_time);
-                    item = _al_list_next (npcs, item);
+                    item = _al_list_next (scene->npcs, item);
                 }
 
                 redraw = true;
@@ -316,11 +326,7 @@ void game_loop (GAME *game)
         }
     }
 
-    _al_list_destroy (npcs);
     aabb_free_collisions (&collisions);
-    aabb_free (collision_tree);
-
-    tiled_free_map (map);
 }
 
 void game_destroy (GAME *game)

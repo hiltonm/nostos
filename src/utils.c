@@ -38,6 +38,7 @@ void get_config_i (ALLEGRO_CONFIG *config, const char *section, const char *key,
 
 char *strdup (const char *s)
 {
+    if (!s) return NULL;
     char *d = malloc (strlen (s) + 1);
     if (d != NULL)
         strcpy (d,s);

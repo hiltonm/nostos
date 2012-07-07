@@ -72,6 +72,7 @@ list(APPEND NOSTOS_SRC_FILES
     ${PROJECT_SOURCE_DIR}/src/aatree.c
     ${PROJECT_SOURCE_DIR}/src/box.c
     ${PROJECT_SOURCE_DIR}/src/game.c
+    ${PROJECT_SOURCE_DIR}/src/scene.c
     ${PROJECT_SOURCE_DIR}/src/screen.c
     ${PROJECT_SOURCE_DIR}/src/sprite.c
     ${PROJECT_SOURCE_DIR}/src/tiled.c
@@ -84,6 +85,7 @@ list(APPEND NOSTOS_HDR_FILES
     ${PROJECT_SOURCE_DIR}/src/aatree.h
     ${PROJECT_SOURCE_DIR}/src/box.h
     ${PROJECT_SOURCE_DIR}/src/game.h
+    ${PROJECT_SOURCE_DIR}/src/scene.h
     ${PROJECT_SOURCE_DIR}/src/screen.h
     ${PROJECT_SOURCE_DIR}/src/sprite.h
     ${PROJECT_SOURCE_DIR}/src/tiled.h

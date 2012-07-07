@@ -6,11 +6,14 @@
 #define _game_h_
 
 #include "sprite.h"
+#include "scene.h"
 #include "screen.h"
 
 #include <allegro5/allegro.h>
 
 typedef struct GAME {
+    SCENES *scenes;
+    SCENE *current_scene;
     SPRITES *sprites;
     SPRITE_ACTOR *current_actor;
     SCREEN screen;
