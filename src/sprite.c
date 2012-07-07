@@ -447,6 +447,11 @@ LIST *sprite_load_npcs (SPRITES *sprites, TILED_MAP *map, const char *layer_name
                     }
 
                     sprite_init_actor (sprites, &npc->actor, charstr);
+                    for (int j = 0; j < npc->num_points; j+=2) {
+                        npc->points[j] -= npc->actor.sprite->tileset->tile_width / 2;
+                        npc->points[j + 1] -= npc->actor.sprite->tileset->tile_height / 2;
+                    }
+
                     npc->actor.position.x = npc->points[0];
                     npc->actor.position.y = npc->points[1];
                     npc->actor.box.center.x = npc->points[0] + npc->actor.sprite->box.center.x;
