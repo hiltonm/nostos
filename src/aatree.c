@@ -13,20 +13,19 @@
  *      By Peter Wang.
  */
 
-/* prettier */
-#define _AL_AATREE Aatree
 
 #include <allegro5/allegro.h>
 #include "aatree.h"
 
-static Aatree nil = { 0, &nil, &nil, NULL, NULL };
 
-static Aatree *skew(Aatree *T)
+static AATREE nil = { 0, &nil, &nil, NULL, NULL };
+
+static AATREE *skew(AATREE *T)
 {
    if (T == &nil)
       return T;
    if (T->left->level == T->level) {
-      Aatree *L = T->left;
+      AATREE *L = T->left;
       T->left = L->right;
       L->right = T;
       return L;
@@ -34,12 +33,12 @@ static Aatree *skew(Aatree *T)
    return T;
 }
 
-static Aatree *split(Aatree *T)
+static AATREE *split(AATREE *T)
 {
    if (T == &nil)
       return T;
    if (T->level == T->right->right->level) {
-      Aatree *R = T->right;
+      AATREE *R = T->right;
       T->right = R->left;
       R->left = T;
       R->level = R->level + 1;
@@ -48,9 +47,9 @@ static Aatree *split(Aatree *T)
    return T;
 }
 
-static Aatree *singleton(const void *key, void *value)
+static AATREE *singleton(const void *key, void *value)
 {
-   Aatree *T = al_malloc(sizeof(Aatree));
+   AATREE *T = al_malloc(sizeof(AATREE));
    T->level = 1;
    T->left = &nil;
    T->right = &nil;
@@ -59,10 +58,11 @@ static Aatree *singleton(const void *key, void *value)
    return T;
 }
 
-static Aatree *doinsert(Aatree *T, const void *key, void *value,
-   _al_cmp_t compare)
+static AATREE *doinsert(AATREE *T, const void *key, void *value,
+   cmp_t compare)
 {
    int cmp;
+   assert (key);
    if (T == &nil) {
       return singleton(key, value);
    }
@@ -82,15 +82,15 @@ static Aatree *doinsert(Aatree *T, const void *key, void *value,
    return T;
 }
 
-Aatree *_al_aa_insert(Aatree *T, const void *key, void *value,
-   _al_cmp_t compare)
+AATREE *aa_insert(AATREE *T, const void *key, void *value,
+   cmp_t compare)
 {
    if (T == NULL)
       T = &nil;
    return doinsert(T, key, value, compare);
 }
 
-void *_al_aa_search(const Aatree *T, const void *key, _al_cmp_t compare)
+void *aa_search(const AATREE *T, const void *key, cmp_t compare)
 {
    if (T == NULL)
       return NULL;
@@ -103,11 +103,11 @@ void *_al_aa_search(const Aatree *T, const void *key, _al_cmp_t compare)
    return NULL;
 }
 
-void _al_aa_free(Aatree *T)
+void aa_free(AATREE *T)
 {
    if (T && T != &nil) {
-      _al_aa_free(T->left);
-      _al_aa_free(T->right);
+      aa_free(T->left);
+      aa_free(T->right);
       al_free(T);
    }
 }

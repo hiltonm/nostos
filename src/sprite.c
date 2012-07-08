@@ -39,8 +39,8 @@ EVENTS default_sprite_events = {
 void sprite_free_sprites (SPRITES *sprites)
 {
     _al_list_destroy(sprites->strings);
-    _al_aa_free (sprites->sprites);
-    _al_aa_free (sprites->tilesets);
+    aa_free (sprites->sprites);
+    aa_free (sprites->tilesets);
     _al_list_destroy (sprites->strings);
     al_free (sprites);
 }
@@ -141,7 +141,7 @@ SPRITES* sprite_load_sprites (const char *filename)
                 tileset->tiles[i].y = (i / tiles_per_row) * tileset->tile_height;
             }
 
-            sprites->tilesets = _al_aa_insert (sprites->tilesets, tileset->name, tileset, charcmp);
+            sprites->tilesets = aa_insert (sprites->tilesets, tileset->name, tileset, charcmp);
         } else if (!strcmp (type, "sprite")) {
             item = _al_list_next (tokens, item);
             SPRITE *sprite = al_malloc (sizeof (SPRITE));
@@ -149,7 +149,7 @@ SPRITES* sprite_load_sprites (const char *filename)
             const char *str = _al_list_item_data (item);
             sprite->name = strdup (str);
             str = al_get_config_value (sprite_config, section, "tileset");
-            sprite->tileset = _al_aa_search (sprites->tilesets, str, charcmp);
+            sprite->tileset = aa_search (sprites->tilesets, str, charcmp);
 
             int duration = 100;
             get_config_i (sprite_config, section, "duration", &duration);
@@ -176,7 +176,7 @@ SPRITES* sprite_load_sprites (const char *filename)
                 al_free (values);
             }
 
-            sprites->sprites = _al_aa_insert (sprites->sprites, sprite->name, sprite, charcmp);
+            sprites->sprites = aa_insert (sprites->sprites, sprite->name, sprite, charcmp);
         }
 
         section = al_get_next_config_section (&it);
@@ -214,7 +214,7 @@ SPRITE_ACTOR *sprite_init ()
 SPRITE_ACTOR *sprite_init_actor (SPRITES *sprites, SPRITE_ACTOR *actor, const char *sprite)
 {
     assert (actor);
-    actor->sprite = _al_aa_search (sprites->sprites, sprite, charcmp);
+    actor->sprite = aa_search (sprites->sprites, sprite, charcmp);
     actor->box.extent = vdivf (&actor->sprite->box.extent, 2.0);
     actor->box.center = vadd (&actor->position, &actor->sprite->box.center);
     return actor;
@@ -432,8 +432,8 @@ LIST *sprite_load_npcs (SPRITES *sprites, TILED_MAP *map, const char *layer_name
                 case OBJECT_TYPE_GEOM:
                     object_geom = (TILED_OBJECT_GEOM *)object;
 
-                    const char *actionstr = _al_aa_search (object_geom->object.properties, "action", charcmp);
-                    const char *charstr = _al_aa_search (object_geom->object.properties, "char", charcmp);
+                    const char *actionstr = aa_search (object_geom->object.properties, "action", charcmp);
+                    const char *charstr = aa_search (object_geom->object.properties, "char", charcmp);
 
                     for (int i = 0; i < NUM_ACTIONS; i++) {
                         if (!strcmp (actionstr, str_npc_actions[i])) {

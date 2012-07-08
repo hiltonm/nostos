@@ -130,7 +130,7 @@ struct TILED_TILE {
     int gid;
     TILED_TILESET *tileset;
     ALLEGRO_BITMAP *bitmap;
-    _AL_AATREE *properties;
+    AATREE *properties;
 };
 
 #define NULL_TILE {0, 0, NULL, NULL, NULL}

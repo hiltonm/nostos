@@ -148,24 +148,24 @@ GAME * game_init ()
     al_set_render_state (ALLEGRO_ALPHA_TEST_VALUE, 1);
 
     char *filename = get_resource_path_str ("data/chars.ini");
-    SPRITES *sprites = sprite_load_sprites (filename);
+    game->sprites = sprite_load_sprites (filename);
     al_free (filename);
 
     filename = get_resource_path_str ("data/scenes.ini");
-    SCENES *scenes = scene_load_file (filename);
-    scene_load_scenes (scenes, sprites);
+    game->scenes = scene_load_file (filename);
+    scene_load_scenes (game->scenes, game->sprites);
     al_free (filename);
 
     filename = get_resource_path_str ("data/entry.ini");
     ALLEGRO_CONFIG *config = al_load_config_file (filename);
 
     const char *str = al_get_config_value (config, "", "scene");
-    game->current_scene = scene_get (scenes, str);
+    game->current_scene = scene_get (game->scenes, str);
 
     str = al_get_config_value (config, "", "actor");
-    game->current_actor = sprite_new_actor (sprites, str);
+    game->current_actor = sprite_new_actor (game->sprites, str);
     str = al_get_config_value (config, "", "portal");
-    SCENE_PORTAL *portal = _al_aa_search (scenes->portals, str, charcmp);
+    SCENE_PORTAL *portal = scene_get_portal (game->scenes, str);
 
     al_free (filename);
     al_destroy_config (config);
@@ -175,6 +175,23 @@ GAME * game_init ()
 
     return game;
 }
+
+static void game_enter_portal (GAME *game, SCENE_PORTAL *portal)
+{
+    assert (game);
+
+    if (!portal || !portal->destiny_portal)
+        return;
+
+    SCENE_PORTAL *dest_portal = scene_get_portal (game->scenes, portal->destiny_portal);
+    if (dest_portal) {
+        debug ("Going to portal %s", dest_portal->name);
+        game->current_scene = dest_portal->scene;
+        sprite_center (game->current_actor, &dest_portal->position);
+        screen_center (&game->screen, dest_portal->position, game->current_scene->map);
+    }
+}
+
 
 void game_loop (GAME *game)
 {
@@ -186,9 +203,13 @@ void game_loop (GAME *game)
     ALLEGRO_FONT *font = al_load_font ("data/fixed_font.tga", 0, 0);
     SCENE *scene;
     SPRITE_ACTOR *actor;
+    LIST_ITEM *item;
 
     AABB_COLLISIONS collisions;
     aabb_init_collisions (&collisions);
+
+    AABB_COLLISIONS portal_collisions;
+    aabb_init_collisions (&portal_collisions);
 
     int i = 0;
     bool redraw = true;
@@ -218,7 +239,7 @@ void game_loop (GAME *game)
 
             al_hold_bitmap_drawing (true);
             sprite_draw (actor, &game->screen);
-            LIST_ITEM *item = _al_list_front (scene->npcs);
+            item = _al_list_front (scene->npcs);
             while (item) {
                 SPRITE_ACTOR *npc_actor = (SPRITE_ACTOR *)_al_list_item_data (item);
                 sprite_draw (npc_actor, &game->screen);
@@ -296,7 +317,7 @@ void game_loop (GAME *game)
 
                 aabb_collide_fill_cache (scene->collision_tree, &box, &collisions);
                 if (scene->collision_tree->num_collisions > 0) {
-                    LIST_ITEM *item = _al_list_front (collisions.boxes);
+                    item = _al_list_front (collisions.boxes);
                     while (item) {
                         if (box_lateral ((BOX *)_al_list_item_data (item), &actor->box))
                             actor->movement.x = 0;
@@ -306,10 +327,22 @@ void game_loop (GAME *game)
                     }
                 }
 
+                aabb_collide_fill_cache (scene->portal_tree, &box, &portal_collisions);
+                if (scene->portal_tree->num_collisions > 0) {
+                    item = _al_list_front (portal_collisions.boxes);
+                    while (item) {
+                        BOX *colbox = _al_list_item_data (item);
+                        TILED_OBJECT *obj = colbox->data;
+                        SCENE_PORTAL *portal = scene_get_portal (game->scenes, obj->name);
+                        game_enter_portal (game, portal);
+                        item = _al_list_next (portal_collisions.boxes, item);
+                    }
+                }
+
                 screen_update (&game->screen, actor->position, scene->map, dt);
                 sprite_update (actor, dt, mean_frame_time);
 
-                LIST_ITEM *item = _al_list_front (scene->npcs);
+                item = _al_list_front (scene->npcs);
                 while (item) {
                     SPRITE_ACTOR *npc_actor = (SPRITE_ACTOR *)_al_list_item_data (item);
                     sprite_update (npc_actor, dt, mean_frame_time);
@@ -328,6 +361,7 @@ void game_loop (GAME *game)
     }
 
     aabb_free_collisions (&collisions);
+    aabb_free_collisions (&portal_collisions);
 }
 
 void game_destroy (GAME *game)
@@ -335,6 +369,7 @@ void game_destroy (GAME *game)
     if (game) {
         al_destroy_display (game->display);
         al_destroy_event_queue (game->event_queue);
+        scene_free (game->scenes);
         al_free (game);
     }
 }

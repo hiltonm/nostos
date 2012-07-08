@@ -75,9 +75,9 @@ void tiled_free_map (TILED_MAP *map)
 {
     _al_list_destroy(map->tilesets);
     _al_list_destroy(map->layers);
-    _al_aa_free (map->properties);
+    aa_free (map->properties);
     _al_list_destroy(map->strings);
-    _al_aa_free (map->tiles);
+    aa_free (map->tiles);
     al_free(map);
 }
 
@@ -86,11 +86,11 @@ static void dtor_tileset(void *value, void *user_data)
     TILED_TILESET *tileset = value;
     al_free (tileset->name);
     al_free (tileset->image_source);
-    _al_aa_free (tileset->properties);
+    aa_free (tileset->properties);
     al_destroy_bitmap (tileset->bitmap);
 
     for (int i=0; i<tileset->num_tiles; i++) {
-        _al_aa_free (tileset->tiles[i].properties);
+        aa_free (tileset->tiles[i].properties);
         al_destroy_bitmap (tileset->tiles[i].bitmap);
     }
     al_free (tileset->tiles);
@@ -101,7 +101,7 @@ static void dtor_layer(void *value, void *user_data)
 {
     TILED_LAYER *layer = (TILED_LAYER*)value;
     al_free (layer->name);
-    _al_aa_free (layer->properties);
+    aa_free (layer->properties);
 
     switch (layer->type) {
         TILED_LAYER_TILE *tile_layer;
@@ -124,7 +124,7 @@ static void dtor_object (void *value, void *user_data)
 {
     TILED_OBJECT *cobject = (TILED_OBJECT *) value;
     al_free (cobject->type_str);
-    _al_aa_free (cobject->properties);
+    aa_free (cobject->properties);
 
     switch (cobject->type) {
         TILED_OBJECT_GEOM *object_geom;
@@ -237,7 +237,7 @@ static AATREE *get_properties (xmlNode *node, TILED_MAP *map)
         xmlNode *prop_node = (xmlNode*)_al_list_item_data (property_item);
         char *name = get_str (prop_node, "name");
         char *value = get_str (prop_node, "value");
-        props = _al_aa_insert (props, (void *)name, (void *)value, charcmp);
+        props = aa_insert (props, (void *)name, (void *)value, charcmp);
         _al_list_push_back_ex (map->strings, name, dtor_string);
         _al_list_push_back_ex (map->strings, value, dtor_string);
         property_item = _al_list_next (property_nodes, property_item);
@@ -336,7 +336,7 @@ TILED_MAP* tiled_load_tmx_file (const char *filename)
                                                 tileset->tile_width,
                                                 tileset->tile_height);
 
-            map->tiles = _al_aa_insert (map->tiles, &tile->gid, tile, intcmp);
+            map->tiles = aa_insert (map->tiles, &tile->gid, tile, intcmp);
         }
 
 		LIST_ITEM *tile_item = _al_list_front (tile_nodes);
@@ -385,7 +385,7 @@ TILED_MAP* tiled_load_tmx_file (const char *filename)
         layer->map = map;
         layer->properties = get_properties (layer_node, map);
 
-        char *order = _al_aa_search (layer->properties, "order", charcmp);
+        char *order = aa_search (layer->properties, "order", charcmp);
 
         if (layer->type == LAYER_TYPE_TILE) {
             TILED_LAYER_TILE *tile_layer = (TILED_LAYER_TILE *)layer;
@@ -404,7 +404,7 @@ TILED_MAP* tiled_load_tmx_file (const char *filename)
                     if (id == 0) {
                         tile_layer->tiles[j][k] = NULL;
                     } else {
-                        TILED_TILE *tile = _al_aa_search (map->tiles, &id, intcmp);
+                        TILED_TILE *tile = aa_search (map->tiles, &id, intcmp);
                         tile_layer->tiles[j][k] = tile;
                     }
 
@@ -438,7 +438,7 @@ TILED_MAP* tiled_load_tmx_file (const char *filename)
                 } else if (gid > 0) {
                     TILED_OBJECT_TILE *obj = al_malloc (sizeof (TILED_OBJECT_TILE));
                     obj->object.type = OBJECT_TYPE_TILE;
-                    obj->tile = _al_aa_search (map->tiles, &gid, intcmp);
+                    obj->tile = aa_search (map->tiles, &gid, intcmp);
 
                     cobj = (TILED_OBJECT *) obj;
                 } else {

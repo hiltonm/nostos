@@ -14,9 +14,18 @@ static void dtor_scene (void *value, void *user_data)
     al_free (scene->portal_layer_name);
     tiled_free_map (scene->map);
     _al_list_destroy (scene->npcs);
+    _al_list_destroy (scene->portals);
     aabb_free (scene->collision_tree);
     aabb_free (scene->portal_tree);
     al_free (scene);
+}
+
+static void dtor_portal (void *value, void *user_data)
+{
+    SCENE_PORTAL *portal = value;
+    al_free (portal->name);
+    al_free (portal->destiny_portal);
+    al_free (portal);
 }
 
 SCENES *scene_load_file (const char *filename)
@@ -30,6 +39,8 @@ SCENES *scene_load_file (const char *filename)
     const char *section = al_get_first_config_section (config, &it);
 
     SCENES *scenes = al_calloc (1, sizeof (SCENES));
+    scenes->tree = NULL;
+    scenes->portals = NULL;
     scenes->scenes = _al_list_create ();
 
     while (section) {
@@ -41,7 +52,7 @@ SCENES *scene_load_file (const char *filename)
         scene->collision_layer_name = strdup (al_get_config_value (config, section, "collision_layer"));
         scene->portal_layer_name = strdup (al_get_config_value (config, section, "portal_layer"));
 
-        scenes->tree = _al_aa_insert (scenes->tree, scene->name, scene, charcmp);
+        scenes->tree = aa_insert (scenes->tree, scene->name, scene, charcmp);
         _al_list_push_back_ex (scenes->scenes, scene, dtor_scene);
         section = al_get_next_config_section (&it);
     }
@@ -52,12 +63,13 @@ SCENES *scene_load_file (const char *filename)
 
 SCENE *scene_get (SCENES *scenes, const char *scene_name)
 {
-    return _al_aa_search (scenes->tree, scene_name, charcmp);
+    return aa_search (scenes->tree, scene_name, charcmp);
 }
 
 SCENE *scene_load (SCENE *scene, SCENES *scenes, SPRITES *sprites)
 {
     assert (scene);
+    assert (scenes);
     assert (sprites);
 
     char *filename = get_resource_path_str (scene->map_filename);
@@ -92,7 +104,11 @@ void scene_load_scenes (SCENES *scenes, SPRITES *sprites)
 
 SCENE_PORTAL *scene_get_portal (SCENES *scenes, const char *portal_name)
 {
-    return _al_aa_search (scenes->portals, portal_name, charcmp);
+    assert (scenes);
+    if (!portal_name)
+        return NULL;
+
+    return aa_search (scenes->portals, portal_name, charcmp);
 }
 
 void scene_load_portals (SCENE *scene, SCENES *scenes, const char *layer_name)
@@ -112,13 +128,14 @@ void scene_load_portals (SCENE *scene, SCENES *scenes, const char *layer_name)
                     object_rect = (TILED_OBJECT_RECT *)object;
                     portal = al_malloc (sizeof (SCENE_PORTAL));
 
-                    portal->name = object->name;
+                    portal->name = strdup (object->name);
                     portal->scene = scene;
-                    char *str = _al_aa_search (object->properties, "portal", charcmp);
-                    portal->destiny_portal = str;
+                    portal->destiny_portal = strdup (aa_search (object->properties, "portal", charcmp));
                     portal->position = (VECTOR2D){object_rect->width / 2.0 + object->x,
                                                   object_rect->height / 2.0 + object->y};
-                    scenes->portals = _al_aa_insert (scenes->portals, portal->name, portal, charcmp);
+                    debug ("New portal %s", portal->name);
+                    scenes->portals = aa_insert (scenes->portals, portal->name, portal, charcmp);
+                    _al_list_push_back_ex (scene->portals, portal, dtor_portal);
 
                     break;
                 default:
@@ -148,7 +165,8 @@ SCENE *scene_unload (SCENE *scene)
 
 void scene_free (SCENES *scenes)
 {
-    _al_aa_free (scenes->tree);
+    aa_free (scenes->tree);
+    aa_free (scenes->portals);
     _al_list_destroy (scenes->scenes);
     al_free (scenes);
 }

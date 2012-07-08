@@ -1,22 +1,22 @@
 #ifndef _aatree_h
 #define _aatree_h
 
-typedef struct _AL_AATREE _AL_AATREE;
+typedef struct AATREE AATREE;
 
-struct _AL_AATREE
+struct AATREE
 {
    int         level;
-   _AL_AATREE  *left;
-   _AL_AATREE  *right;
+   AATREE      *left;
+   AATREE      *right;
    const void  *key;
    void        *value;
 };
 
-typedef int (*_al_cmp_t)(const void *a, const void *b);
+typedef int (*cmp_t)(const void *a, const void *b);
 
-_AL_AATREE *_al_aa_insert(_AL_AATREE *T, const void *key, void *value, _al_cmp_t compare);
-void *_al_aa_search(const _AL_AATREE *T, const void *key, _al_cmp_t compare);
-void _al_aa_free(_AL_AATREE *T);
+AATREE *aa_insert(AATREE *T, const void *key, void *value, cmp_t compare);
+void *aa_search(const AATREE *T, const void *key, cmp_t compare);
+void aa_free(AATREE *T);
 
 #endif
 

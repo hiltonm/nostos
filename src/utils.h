@@ -14,7 +14,6 @@
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
 #define CLAMP(x,y,z) MAX((x), MIN((y), (z)))
 
-#define AATREE _AL_AATREE
 #define LIST _AL_LIST
 #define VECTOR _AL_VECTOR
 #define LIST_ITEM _AL_LIST_ITEM

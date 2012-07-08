@@ -86,8 +86,8 @@ typedef struct SPRITE_NPC {
 } SPRITE_NPC;
 
 typedef struct SPRITES {
-    _AL_AATREE *sprites;
-    _AL_AATREE *tilesets;
+    AATREE *sprites;
+    AATREE *tilesets;
     _AL_LIST *strings;
 } SPRITES;
 
