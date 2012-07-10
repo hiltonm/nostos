@@ -23,6 +23,7 @@ typedef struct GAME {
     ALLEGRO_TIMER *timer;
 
     bool running;
+    bool paused;
 
     int fullscreen;
     int windowed;

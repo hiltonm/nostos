@@ -488,22 +488,22 @@ TILED_MAP* tiled_load_tmx_file (const char *filename)
     return map;
 }
 
-void tiled_draw_map (TILED_MAP *map, float sx, float sy, float sw, float sh, float dx, float dy, int flags)
+void tiled_draw_map (TILED_MAP *map, ALLEGRO_COLOR tint, float sx, float sy, float sw, float sh, float dx, float dy, int flags)
 {
-    tiled_draw_layers (map->layers, sx, sy, sw, sh, dx, dy, flags);
+    tiled_draw_layers (map->layers, tint, sx, sy, sw, sh, dx, dy, flags);
 }
 
-void tiled_draw_map_back (TILED_MAP *map, float sx, float sy, float sw, float sh, float dx, float dy, int flags)
+void tiled_draw_map_back (TILED_MAP *map, ALLEGRO_COLOR tint, float sx, float sy, float sw, float sh, float dx, float dy, int flags)
 {
-    tiled_draw_layers (map->layers_back, sx, sy, sw, sh, dx, dy, flags);
+    tiled_draw_layers (map->layers_back, tint, sx, sy, sw, sh, dx, dy, flags);
 }
 
-void tiled_draw_map_fore (TILED_MAP *map, float sx, float sy, float sw, float sh, float dx, float dy, int flags)
+void tiled_draw_map_fore (TILED_MAP *map, ALLEGRO_COLOR tint, float sx, float sy, float sw, float sh, float dx, float dy, int flags)
 {
-    tiled_draw_layers (map->layers_fore, sx, sy, sw, sh, dx, dy, flags);
+    tiled_draw_layers (map->layers_fore, tint, sx, sy, sw, sh, dx, dy, flags);
 }
 
-void tiled_draw_layers (LIST *layers, float sx, float sy, float sw, float sh, float dx, float dy, int flags)
+void tiled_draw_layers (LIST *layers, ALLEGRO_COLOR tint, float sx, float sy, float sw, float sh, float dx, float dy, int flags)
 {
     LIST_ITEM *layer_item = _al_list_front (layers);
     TILED_LAYER *layer = _al_list_item_data (layer_item);
@@ -531,7 +531,7 @@ void tiled_draw_layers (LIST *layers, float sx, float sy, float sw, float sh, fl
                     TILED_TILE *tile = tile_layer->tiles[j][i];
 
                     if (tile)
-                        al_draw_bitmap (tile->bitmap, x, y, 0);
+                        al_draw_tinted_bitmap (tile->bitmap, tint, x, y, 0);
 
                     x += map->tile_width;
                 }

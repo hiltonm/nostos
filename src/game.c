@@ -21,6 +21,7 @@
 
 #define FPS 80
 #define NTIMES 10
+#define TRANS_TIME 0.3f
 
 GAME * game_init ()
 {
@@ -52,6 +53,7 @@ GAME * game_init ()
     srand (time (NULL));
 
     game->running = true;
+    game->paused = false;
 
     game->fullscreen = 1;
     game->windowed = 1;
@@ -176,20 +178,19 @@ GAME * game_init ()
     return game;
 }
 
-static void game_enter_portal (GAME *game, SCENE_PORTAL *portal)
+static bool game_enter_portal (GAME *game, SCENE_PORTAL *portal)
 {
     assert (game);
 
-    if (!portal || !portal->destiny_portal)
-        return;
-
-    SCENE_PORTAL *dest_portal = scene_get_portal (game->scenes, portal->destiny_portal);
-    if (dest_portal) {
-        debug ("Going to portal %s", dest_portal->name);
-        game->current_scene = dest_portal->scene;
-        sprite_center (game->current_actor, &dest_portal->position);
-        screen_center (&game->screen, dest_portal->position, game->current_scene->map);
+    if (portal) {
+        debug ("Going to portal %s", portal->name);
+        game->current_scene = portal->scene;
+        sprite_center (game->current_actor, &portal->position);
+        screen_center (&game->screen, portal->position, game->current_scene->map);
+        return true;
     }
+
+    return false;
 }
 
 
@@ -222,14 +223,19 @@ void game_loop (GAME *game)
     current_time = al_get_time ();
     al_start_timer (game->timer);
 
+    float fadeout_duration = 0;
+    float fadein_duration = 0;
+    SCENE_PORTAL *dest_portal = NULL;
+
     while (game->running) {
         scene = game->current_scene;
         actor = game->current_actor;
 
         if (redraw) {
             al_clear_depth_buffer (0);
-            tiled_draw_map_back (scene->map, game->screen.position.x, game->screen.position.y,
-                                             game->screen.width, game->screen.height, 0, 0, 0);
+            tiled_draw_map_back (scene->map, game->screen.tint,
+                                 game->screen.position.x, game->screen.position.y,
+                                 game->screen.width, game->screen.height, 0, 0, 0);
 
             al_draw_textf (font, al_map_rgba_f (0.9, 0, 0, 1), 5, 5, 0, "FPS: %.2f", curfps);
 
@@ -261,8 +267,9 @@ void game_loop (GAME *game)
                 aabb_draw (scene->collision_tree, &game->screen, al_map_rgb_f (0, 0, 1));
             }
 
-            tiled_draw_map_fore (scene->map, game->screen.position.x, game->screen.position.y,
-                                             game->screen.width, game->screen.height, 0, 0, 0);
+            tiled_draw_map_fore (scene->map, game->screen.tint,
+                                 game->screen.position.x, game->screen.position.y,
+                                 game->screen.width, game->screen.height, 0, 0, 0);
 
             if (game->force_vsync)
                 al_wait_for_vsync ();
@@ -290,6 +297,32 @@ void game_loop (GAME *game)
                 curfps = 1.0 / mean_frame_time;
 
                 dt = mean_frame_time / fixed_dt;
+
+                if (fadeout_duration > 0.0f) {
+                    float fadef = fadeout_duration / TRANS_TIME;
+                    game->screen.tint = al_map_rgba_f (fadef, fadef, fadef, 1.0);
+                    fadeout_duration -= mean_frame_time;
+                    if (fadeout_duration <= 0.0f) {
+                        fadein_duration = TRANS_TIME;
+                        fadeout_duration = 0.0f;
+                        game_enter_portal (game, dest_portal);
+                    }
+                }
+
+                if (fadein_duration > 0.0f) {
+                    float fadef = 1.0 - fadein_duration / TRANS_TIME;
+                    game->screen.tint = al_map_rgba_f (fadef, fadef, fadef, 1.0);
+                    fadein_duration -= mean_frame_time;
+                    if (fadein_duration <= 0.0f) {
+                        game->paused = false;
+                        fadein_duration = 0.0f;
+                    }
+                }
+
+                if (game->paused) {
+                    redraw = true;
+                    break;
+                }
 
                 al_get_keyboard_state (&keyboard_state);
 
@@ -334,7 +367,13 @@ void game_loop (GAME *game)
                         BOX *colbox = _al_list_item_data (item);
                         TILED_OBJECT *obj = colbox->data;
                         SCENE_PORTAL *portal = scene_get_portal (game->scenes, obj->name);
-                        game_enter_portal (game, portal);
+                        if (portal && portal->destiny_portal) {
+                            dest_portal = scene_get_portal (game->scenes, portal->destiny_portal);
+                            if (dest_portal) {
+                                fadeout_duration = TRANS_TIME;
+                                game->paused = true;
+                            }
+                        }
                         item = _al_list_next (portal_collisions.boxes, item);
                     }
                 }

@@ -18,6 +18,7 @@ typedef struct SCREEN {
     float movement_max;
     float focus_width;
     float focus_height;
+    ALLEGRO_COLOR tint;
 } SCREEN;
 
 SCREEN screen_new ();

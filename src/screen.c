@@ -8,6 +8,8 @@
 #include <assert.h>
 #include <math.h>
 
+static ALLEGRO_COLOR solid_white = {1, 1, 1, 1};
+
 SCREEN screen_new ()
 {
     return (SCREEN){
@@ -19,7 +21,8 @@ SCREEN screen_new ()
         0.3, 0.1,
         3,
         30.0 / 100.0,
-        30.0 / 100.0
+        30.0 / 100.0,
+        solid_white
     };
 }
 
@@ -69,5 +72,6 @@ void screen_center (SCREEN *screen, VECTOR2D focus, TILED_MAP *map)
     screen->position.y = focus.y - screen->height * 0.5f;
     screen->position.x = CLAMP (0, round (screen->position.x), map->width * map->tile_width - screen->width);
     screen->position.y = CLAMP (0, round (screen->position.y), map->height * map->tile_height - screen->height);
+    screen->movement = (VECTOR2D){0.0f, 0.0f};
 }
 

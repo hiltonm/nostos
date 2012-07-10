@@ -402,12 +402,11 @@ void sprite_draw (SPRITE_ACTOR *actor, SCREEN *screen)
 
     SPRITE_ANIMATION *anim = &actor->sprite->animations[actor->current_animation];
     VECTOR2D *tile = &actor->sprite->tileset->tiles[anim->frames[actor->current_frame]];
-    ALLEGRO_COLOR white = {255, 255, 255, 255};
     ALLEGRO_VERTEX v[] = {
-        {.x = x,     .y = y,     .z = z, .u = tile->x,     .v = tile->y,     .color = white},
-        {.x = x,     .y = y + h, .z = z, .u = tile->x,     .v = tile->y + h, .color = white},
-        {.x = x + w, .y = y + h, .z = z, .u = tile->x + w, .v = tile->y + h, .color = white},
-        {.x = x + w, .y = y,     .z = z, .u = tile->x + w, .v = tile->y,     .color = white},
+        {.x = x,     .y = y,     .z = z, .u = tile->x,     .v = tile->y,     .color = screen->tint},
+        {.x = x,     .y = y + h, .z = z, .u = tile->x,     .v = tile->y + h, .color = screen->tint},
+        {.x = x + w, .y = y + h, .z = z, .u = tile->x + w, .v = tile->y + h, .color = screen->tint},
+        {.x = x + w, .y = y,     .z = z, .u = tile->x + w, .v = tile->y,     .color = screen->tint},
     };
     al_draw_prim (v, NULL, actor->sprite->tileset->bitmap, 0, 4, ALLEGRO_PRIM_TRIANGLE_FAN);
     //box_draw (&actor->box, screen, al_map_rgb_f (1, 1, 1));

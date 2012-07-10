@@ -138,10 +138,10 @@ struct TILED_TILE {
 
 TILED_MAP* tiled_load_tmx_file (const char *filename);
 TILED_LAYER* tiled_layer_by_name (TILED_MAP *map, const char *name);
-void tiled_draw_map (TILED_MAP *map, float sx, float sy, float sw, float sh, float dx, float dy, int flags);
-void tiled_draw_layers (LIST *layers, float sx, float sy, float sw, float sh, float dx, float dy, int flags);
-void tiled_draw_map_back (TILED_MAP *map, float sx, float sy, float sw, float sh, float dx, float dy, int flags);
-void tiled_draw_map_fore (TILED_MAP *map, float sx, float sy, float sw, float sh, float dx, float dy, int flags);
+void tiled_draw_map (TILED_MAP *map, ALLEGRO_COLOR tint, float sx, float sy, float sw, float sh, float dx, float dy, int flags);
+void tiled_draw_layers (LIST *layers, ALLEGRO_COLOR tint, float sx, float sy, float sw, float sh, float dx, float dy, int flags);
+void tiled_draw_map_back (TILED_MAP *map, ALLEGRO_COLOR tint, float sx, float sy, float sw, float sh, float dx, float dy, int flags);
+void tiled_draw_map_fore (TILED_MAP *map, ALLEGRO_COLOR tint, float sx, float sy, float sw, float sh, float dx, float dy, int flags);
 void tiled_free_map (TILED_MAP *map);
 
 #endif
