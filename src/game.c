@@ -257,14 +257,14 @@ void game_loop (GAME *game)
             al_set_render_state (ALLEGRO_ALPHA_TEST, false);
 
             if (false) {
-                item = _al_list_front (collisions.boxes);
+                item = _al_list_front (portal_collisions.boxes);
                 while (item) {
                     BOX *box = _al_list_item_data (item);
                     box_draw (box, &game->screen, al_map_rgb_f (1, 0, 0));
-                    item = _al_list_next (collisions.boxes, item);
+                    item = _al_list_next (portal_collisions.boxes, item);
                 }
 
-                aabb_draw (scene->collision_tree, &game->screen, al_map_rgb_f (0, 0, 1));
+                aabb_draw (scene->portal_tree, &game->screen, al_map_rgb_f (0, 0, 1));
             }
 
             tiled_draw_map_fore (scene->map, game->screen.tint,
@@ -372,6 +372,8 @@ void game_loop (GAME *game)
                             if (dest_portal) {
                                 fadeout_duration = TRANS_TIME;
                                 game->paused = true;
+                                actor->movement = (VECTOR2D){0, 0};
+                                break;
                             }
                         }
                         item = _al_list_next (portal_collisions.boxes, item);

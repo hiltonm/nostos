@@ -505,7 +505,11 @@ void tiled_draw_map_fore (TILED_MAP *map, ALLEGRO_COLOR tint, float sx, float sy
 
 void tiled_draw_layers (LIST *layers, ALLEGRO_COLOR tint, float sx, float sy, float sw, float sh, float dx, float dy, int flags)
 {
+    assert (layers);
     LIST_ITEM *layer_item = _al_list_front (layers);
+    if (!layer_item)
+        return;
+
     TILED_LAYER *layer = _al_list_item_data (layer_item);
     TILED_MAP *map = layer->map;
     int ti = floor (sx / map->tile_width);

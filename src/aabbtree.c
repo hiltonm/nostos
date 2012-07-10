@@ -224,10 +224,6 @@ AABB_TREE *aabb_build_tree (BOX *boxes, int num_boxes, int max_depth)
     while(true) {
         AUX_NODE *node = _al_vector_ref (&auxnodes, off++);
         process_node (node, &auxnodes, max_depth);
-        if (off > 50) {
-            debug ("BULLSHIT");
-            break;
-        }
         if (off == _al_vector_size (&auxnodes))
             break;
     }
@@ -353,7 +349,7 @@ AABB_TREE *aabb_load_tree (TILED_MAP *map, const char *layer_name)
     }
 
     if (boxes) {
-        AABB_TREE *tree = aabb_build_tree (boxes, num_boxes, 4);
+        AABB_TREE *tree = aabb_build_tree (boxes, num_boxes, MIN (num_boxes - 1, 4));
         tree->use_cache = false;
         tree->collisions = NULL;
         free (boxes);
