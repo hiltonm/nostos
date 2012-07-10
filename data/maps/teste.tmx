@@ -24,7 +24,7 @@
  <tileset firstgid="181" name="dirt" tilewidth="32" tileheight="32">
   <image source="../sprites/dirt.png" width="96" height="192"/>
  </tileset>
- <layer name="Back0" width="100" height="100">
+ <layer name="ground" width="100" height="100">
   <data>
    <tile gid="11"/>
    <tile gid="11"/>
@@ -10028,7 +10028,7 @@
    <tile gid="11"/>
   </data>
  </layer>
- <layer name="Back1" width="100" height="100">
+ <layer name="overground" width="100" height="100">
   <data>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -20032,7 +20032,7 @@
    <tile gid="0"/>
   </data>
  </layer>
- <layer name="Back2" width="100" height="100">
+ <layer name="walls" width="100" height="100">
   <data>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -24581,7 +24581,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="80"/>
+   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -25095,7 +25095,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="96"/>
+   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -30036,7 +30036,7 @@
    <tile gid="0"/>
   </data>
  </layer>
- <layer name="Back3" width="100" height="100">
+ <layer name="doors" width="100" height="100">
   <data>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -30847,7 +30847,11 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
+   <tile gid="160"/>
+   <tile gid="161"/>
    <tile gid="0"/>
+   <tile gid="160"/>
+   <tile gid="161"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -30943,15 +30947,11 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="169"/>
+   <tile gid="170"/>
    <tile gid="84"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="169"/>
+   <tile gid="170"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -31784,10 +31784,11 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
+   <tile gid="160"/>
+   <tile gid="161"/>
    <tile gid="0"/>
-   <tile gid="144"/>
-   <tile gid="145"/>
-   <tile gid="146"/>
+   <tile gid="160"/>
+   <tile gid="161"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -31883,11 +31884,11 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="153"/>
+   <tile gid="169"/>
+   <tile gid="170"/>
    <tile gid="84"/>
-   <tile gid="155"/>
+   <tile gid="169"/>
+   <tile gid="170"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -31985,9 +31986,8 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="162"/>
    <tile gid="93"/>
-   <tile gid="164"/>
+   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -40040,7 +40040,7 @@
    <tile gid="0"/>
   </data>
  </layer>
- <layer name="Back4" width="100" height="100">
+ <layer name="stairs" width="100" height="100">
   <data>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -41788,11 +41788,10 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="160"/>
-   <tile gid="161"/>
+   <tile gid="0"/>
+   <tile gid="144"/>
    <tile gid="102"/>
-   <tile gid="160"/>
-   <tile gid="161"/>
+   <tile gid="146"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -41888,12 +41887,11 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="169"/>
-   <tile gid="170"/>
    <tile gid="0"/>
-   <tile gid="169"/>
-   <tile gid="170"/>
    <tile gid="0"/>
+   <tile gid="153"/>
+   <tile gid="154"/>
+   <tile gid="155"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -41990,8 +41988,10 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="85"/>
    <tile gid="0"/>
+   <tile gid="162"/>
+   <tile gid="163"/>
+   <tile gid="164"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -50044,7 +50044,7 @@
    <tile gid="0"/>
   </data>
  </layer>
- <layer name="Fore1" width="100" height="100">
+ <layer name="fore" width="100" height="100">
   <properties>
    <property name="order" value="fore"/>
   </properties>
@@ -55010,7 +55010,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="87"/>
+   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -60051,7 +60051,7 @@
    <tile gid="0"/>
   </data>
  </layer>
- <layer name="Fore2" width="100" height="100">
+ <layer name="treetops" width="100" height="100">
   <properties>
    <property name="order" value="fore"/>
   </properties>
@@ -70132,28 +70132,30 @@
   <object x="1152" y="608" width="32" height="32"/>
   <object x="544" y="704" width="32" height="32"/>
   <object x="2560" y="480" width="32" height="32"/>
-  <object x="1952" y="1600" width="32" height="32"/>
   <object x="2720" y="1408" width="32" height="32"/>
+  <object x="2048" y="1376" width="160" height="192"/>
  </objectgroup>
  <objectgroup name="portal" width="100" height="100">
-  <object name="in_02" x="864" y="768" width="32" height="32">
+  <object name="village:in_02" x="864" y="768" width="32" height="32">
    <properties>
-    <property name="portal" value="out_01"/>
+    <property name="portal" value="house2:entry"/>
    </properties>
   </object>
-  <object name="out_02" x="864" y="800" width="32" height="32"/>
-  <object name="in_03" x="1536" y="608" width="32" height="32">
+  <object name="village:out_02" x="864" y="800" width="32" height="32"/>
+  <object name="village:in_03" x="1536" y="608" width="32" height="32">
    <properties>
-    <property name="portal" value="out_02"/>
+    <property name="portal" value="house3:entry"/>
    </properties>
   </object>
-  <object name="out_03" x="1536" y="640" width="32" height="32"/>
-  <object name="entry" x="672" y="1152" width="32" height="32"/>
-  <object name="in_01" x="352" y="320" width="32" height="32">
+  <object name="village:out_03" x="1536" y="640" width="32" height="32"/>
+  <object name="village:entry" x="672" y="1152" width="32" height="32"/>
+  <object name="village:in_01" x="352" y="320" width="32" height="32">
    <properties>
-    <property name="portal" value="out_03"/>
+    <property name="portal" value="house1:entry"/>
    </properties>
   </object>
-  <object name="out_01" x="352" y="352" width="32" height="32"/>
+  <object name="village:out_01" x="352" y="352" width="32" height="32"/>
+  <object name="village:in_04" x="2144" y="1536" width="32" height="32"/>
+  <object name="village:out_04" x="2144" y="1568" width="32" height="32"/>
  </objectgroup>
 </map>
