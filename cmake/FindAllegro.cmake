@@ -31,10 +31,10 @@ append_lib_type_suffix(ALLEGRO_IMAGE_NAME)
 append_lib_type_suffix(ALLEGRO_FONT_NAME)
 append_lib_type_suffix(ALLEGRO_PRIMITIVES_NAME)
 
-find_library(ALLEGRO_LIBRARY NAMES ${ALLEGRO_NAME})
-find_library(ALLEGRO_IMAGE_LIBRARY NAMES ${ALLEGRO_IMAGE_NAME})
-find_library(ALLEGRO_FONT_LIBRARY NAMES ${ALLEGRO_FONT_NAME})
-find_library(ALLEGRO_PRIMITIVES_LIBRARY NAMES ${ALLEGRO_PRIMITIVES_NAME})
+find_library(ALLEGRO_LIBRARY NAMES ${ALLEGRO_NAME} allegro)
+find_library(ALLEGRO_IMAGE_LIBRARY NAMES ${ALLEGRO_IMAGE_NAME} allegro_image)
+find_library(ALLEGRO_FONT_LIBRARY NAMES ${ALLEGRO_FONT_NAME} allegro_font)
+find_library(ALLEGRO_PRIMITIVES_LIBRARY NAMES ${ALLEGRO_PRIMITIVES_NAME} allegro_primitives)
 
 # Handle the QUIETLY and REQUIRED arguments and set ALLEGRO_FOUND to TRUE if
 # all listed variables are TRUE.
