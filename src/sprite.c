@@ -2,8 +2,8 @@
  * See LICENSE for copyright information.
  */
 
-#include "sprite.h"
-#include "utils.h"
+#include "nostos/sprite.h"
+#include "nostos/utils.h"
 
 #include <allegro5/allegro_primitives.h>
 

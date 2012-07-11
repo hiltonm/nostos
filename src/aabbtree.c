@@ -2,12 +2,9 @@
  * See LICENSE for copyright information.
  */
 
-#include "aabbtree.h"
 
-#include <allegro5/allegro.h>
-#include <allegro5/internal/aintern_vector.h>
-
-#include "utils.h"
+#include "nostos/aabbtree.h"
+#include "nostos/utils.h"
 
 #include <float.h>
 

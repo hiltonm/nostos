@@ -2,7 +2,7 @@
  * See LICENSE for copyright information.
  */
 
-#include "utils.h"
+#include "nostos/utils.h"
 
 #include <stdio.h>
 

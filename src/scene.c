@@ -2,7 +2,7 @@
  * See LICENSE for copyright information.
  */
 
-#include "scene.h"
+#include "nostos/scene.h"
 
 static void dtor_scene (void *value, void *user_data)
 {

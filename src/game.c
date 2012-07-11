@@ -2,18 +2,18 @@
  * See LICENSE for copyright information.
  */
 
-#include "game.h"
+#include "nostos/game.h"
 
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 
-#include "vector2d.h"
-#include "tiled.h"
-#include "sprite.h"
-#include "aabbtree.h"
-#include "screen.h"
-#include "utils.h"
+#include "nostos/vector2d.h"
+#include "nostos/tiled.h"
+#include "nostos/sprite.h"
+#include "nostos/aabbtree.h"
+#include "nostos/screen.h"
+#include "nostos/utils.h"
 
 #include <stdio.h>
 #include <math.h>

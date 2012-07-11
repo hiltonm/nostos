@@ -74,16 +74,16 @@ list(APPEND NOSTOS_SRC_FILES
     ${PROJECT_SOURCE_DIR}/src/vector2d.c
 )
 list(APPEND NOSTOS_HDR_FILES
-    ${PROJECT_SOURCE_DIR}/src/aabbtree.h
-    ${PROJECT_SOURCE_DIR}/src/aatree.h
-    ${PROJECT_SOURCE_DIR}/src/box.h
-    ${PROJECT_SOURCE_DIR}/src/game.h
-    ${PROJECT_SOURCE_DIR}/src/scene.h
-    ${PROJECT_SOURCE_DIR}/src/screen.h
-    ${PROJECT_SOURCE_DIR}/src/sprite.h
-    ${PROJECT_SOURCE_DIR}/src/tiled.h
-    ${PROJECT_SOURCE_DIR}/src/utils.h
-    ${PROJECT_SOURCE_DIR}/src/vector2d.h
+    ${PROJECT_SOURCE_DIR}/include/nostos/aabbtree.h
+    ${PROJECT_SOURCE_DIR}/include/nostos/aatree.h
+    ${PROJECT_SOURCE_DIR}/include/nostos/box.h
+    ${PROJECT_SOURCE_DIR}/include/nostos/game.h
+    ${PROJECT_SOURCE_DIR}/include/nostos/scene.h
+    ${PROJECT_SOURCE_DIR}/include/nostos/screen.h
+    ${PROJECT_SOURCE_DIR}/include/nostos/sprite.h
+    ${PROJECT_SOURCE_DIR}/include/nostos/tiled.h
+    ${PROJECT_SOURCE_DIR}/include/nostos/utils.h
+    ${PROJECT_SOURCE_DIR}/include/nostos/vector2d.h
 )
 
 
@@ -102,7 +102,7 @@ set_target_properties(nostos PROPERTIES
 # Build Examples
 # =========
 
-add_executable(demo1
+add_executable(nostos-demo1
     ${PROJECT_SOURCE_DIR}/examples/demo1.c
 )
 
@@ -111,7 +111,7 @@ add_executable(demo1
 # ==============
 
 target_link_libraries(nostos ${LINK_LIBS})
-target_link_libraries(demo1 nostos)
+target_link_libraries(nostos-demo1 nostos)
 
 
 # Installation
@@ -121,11 +121,14 @@ install(TARGETS nostos
     LIBRARY DESTINATION lib
 )
 
-install(TARGETS demo1
-    RUNTIME DESTINATION bin
-)
-
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/*.h
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/nostos
         DESTINATION include
 )
 
+install(TARGETS nostos-demo1
+    RUNTIME DESTINATION opt/nostos
+)
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/data
+        DESTINATION opt/nostos
+)

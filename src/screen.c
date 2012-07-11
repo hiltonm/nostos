@@ -2,8 +2,8 @@
  * See LICENSE for copyright information.
  */
 
-#include "screen.h"
-#include "utils.h"
+#include "nostos/screen.h"
+#include "nostos/utils.h"
 
 #include <assert.h>
 #include <math.h>

@@ -2,12 +2,12 @@
  * See LICENSE for copyright information.
  */
 
-#include "vector2d.h"
+#include "nostos/vector2d.h"
 
 #include <math.h>
 #include <assert.h>
 
-#include "utils.h"
+#include "nostos/utils.h"
 
 VECTOR2D vadd (const VECTOR2D* v1, const VECTOR2D* v2)
 {

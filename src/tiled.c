@@ -2,7 +2,7 @@
  * See LICENSE for copyright information.
  */
 
-#include "tiled.h"
+#include "nostos/tiled.h"
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
@@ -14,7 +14,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "utils.h"
+#include "nostos/utils.h"
 
 
 static LIST *get_children_for_name(xmlNode *parent, int nargs, ...)

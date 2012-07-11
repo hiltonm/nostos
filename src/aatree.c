@@ -15,7 +15,7 @@
 
 
 #include <allegro5/allegro.h>
-#include "aatree.h"
+#include "nostos/aatree.h"
 
 
 static AATREE nil = { 0, &nil, &nil, NULL, NULL };

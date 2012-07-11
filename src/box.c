@@ -2,14 +2,14 @@
  * See LICENSE for copyright information.
  */
 
-#include "box.h"
+#include "nostos/box.h"
+#include "nostos/utils.h"
 
 #include <math.h>
 #include <assert.h>
 
 #include <allegro5/allegro_primitives.h>
 
-#include "utils.h"
 
 BOX box_from_points (VECTOR2D v1, VECTOR2D v2)
 {
