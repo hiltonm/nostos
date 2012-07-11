@@ -33,14 +33,8 @@ endif()
 
 add_definitions(-std=c99)
 
-option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-#option(BUILD_SAMPLES "Build samples" OFF)
-
-#if(NOT BUILD_SHARED_LIBS)
-#    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
-#endif()
-
-#set(PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/..)
+option(BUILD_SHARED_LIBS "Build shared library" ON)
+option(BUILD_EXAMPLES "Build examples" ON)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/include
@@ -78,7 +72,6 @@ list(APPEND NOSTOS_SRC_FILES
     ${PROJECT_SOURCE_DIR}/src/tiled.c
     ${PROJECT_SOURCE_DIR}/src/utils.c
     ${PROJECT_SOURCE_DIR}/src/vector2d.c
-    ${PROJECT_SOURCE_DIR}/src/main.c
 )
 list(APPEND NOSTOS_HDR_FILES
     ${PROJECT_SOURCE_DIR}/src/aabbtree.h
@@ -94,36 +87,45 @@ list(APPEND NOSTOS_HDR_FILES
 )
 
 
-# Build Example
+# Build Library
 # =========
 
-add_executable(nostos
+add_library(nostos
     ${NOSTOS_SRC_FILES}
     ${NOSTOS_HDR_FILES}
 )
 
 set_target_properties(nostos PROPERTIES
     VERSION ${PROJECT_VERSION}
-#    LINK_SEARCH_START_STATIC on
 )
 
-install(TARGETS nostos
-    RUNTIME DESTINATION bin
+# Build Examples
+# =========
+
+add_executable(demo1
+    ${PROJECT_SOURCE_DIR}/examples/demo1.c
 )
+
 
 # Link libraries
 # ==============
 
 target_link_libraries(nostos ${LINK_LIBS})
+target_link_libraries(demo1 nostos)
 
 
 # Installation
 # ============
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/nostos
+install(TARGETS nostos
+    LIBRARY DESTINATION lib
+)
+
+install(TARGETS demo1
+    RUNTIME DESTINATION bin
+)
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/*.h
         DESTINATION include
 )
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/bin
-        DESTINATION bin
-)
