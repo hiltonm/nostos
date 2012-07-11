@@ -411,6 +411,8 @@ void game_destroy (GAME *game)
         al_destroy_display (game->display);
         al_destroy_event_queue (game->event_queue);
         scene_free (game->scenes);
+        sprite_free (game->sprites);
+        sprite_free_actor (game->current_actor, NULL);
         al_free (game);
     }
 }

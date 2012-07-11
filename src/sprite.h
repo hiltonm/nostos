@@ -88,7 +88,9 @@ typedef struct SPRITE_NPC {
 typedef struct SPRITES {
     AATREE *sprites;
     AATREE *tilesets;
-    _AL_LIST *strings;
+    LIST *sprites_list;
+    LIST *tilesets_list;
+    LIST *strings;
 } SPRITES;
 
 void sprite_move_down (void *sprite, float dt);
@@ -101,5 +103,8 @@ SPRITE_ACTOR *sprite_new_actor (SPRITES *sprites, const char *filename);
 SPRITES *sprite_load_sprites (const char *filename);
 LIST *sprite_load_npcs (SPRITES *sprites, TILED_MAP *map, const char *layer_name);
 void sprite_center (SPRITE_ACTOR *actor, VECTOR2D *v);
+void sprite_free (SPRITES *sprites);
+void sprite_free_actor (void *value, void *user_data);
+void sprite_free_npc (void *value, void *user_data);
 
 #endif

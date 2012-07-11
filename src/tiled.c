@@ -75,6 +75,8 @@ void tiled_free_map (TILED_MAP *map)
 {
     _al_list_destroy(map->tilesets);
     _al_list_destroy(map->layers);
+    _al_list_destroy(map->layers_fore);
+    _al_list_destroy(map->layers_back);
     aa_free (map->properties);
     _al_list_destroy(map->strings);
     aa_free (map->tiles);
@@ -123,6 +125,7 @@ static void dtor_layer(void *value, void *user_data)
 static void dtor_object (void *value, void *user_data)
 {
     TILED_OBJECT *cobject = (TILED_OBJECT *) value;
+    al_free (cobject->name);
     al_free (cobject->type_str);
     aa_free (cobject->properties);
 
@@ -484,6 +487,7 @@ TILED_MAP* tiled_load_tmx_file (const char *filename)
 
     ALLEGRO_PATH *respath = al_get_standard_path (ALLEGRO_RESOURCES_PATH);
     al_change_directory (al_path_cstr (respath, ALLEGRO_NATIVE_PATH_SEP));
+    al_destroy_path (respath);
 
     return map;
 }

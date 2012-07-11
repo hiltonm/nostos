@@ -36,11 +36,12 @@ EVENTS default_sprite_events = {
     sprite_move_right
 };
 
-void sprite_free_sprites (SPRITES *sprites)
+void sprite_free (SPRITES *sprites)
 {
-    _al_list_destroy(sprites->strings);
     aa_free (sprites->sprites);
     aa_free (sprites->tilesets);
+    _al_list_destroy (sprites->sprites_list);
+    _al_list_destroy (sprites->tilesets_list);
     _al_list_destroy (sprites->strings);
     al_free (sprites);
 }
@@ -67,9 +68,16 @@ static void dtor_sprite (void *value, void *user_data)
     al_free (sprite);
 }
 
-static void dtor_actor (void *value, void *user_data)
+void sprite_free_actor (void *value, void *user_data)
 {
     SPRITE_ACTOR *actor = value;
+    al_free (actor);
+}
+
+void sprite_free_npc (void *value, void *user_data)
+{
+    SPRITE_NPC *actor = value;
+    al_free (actor->points);
     al_free (actor);
 }
 
@@ -109,6 +117,8 @@ SPRITES* sprite_load_sprites (const char *filename)
     const char *section = al_get_first_config_section (sprite_config, &it);
 
     SPRITES *sprites = al_calloc (1, sizeof (SPRITES));
+    sprites->sprites_list = _al_list_create ();
+    sprites->tilesets_list = _al_list_create ();
 
     do {
         LIST *tokens = split (section, " ");
@@ -142,6 +152,7 @@ SPRITES* sprite_load_sprites (const char *filename)
             }
 
             sprites->tilesets = aa_insert (sprites->tilesets, tileset->name, tileset, charcmp);
+            _al_list_push_back_ex (sprites->tilesets_list, tileset, dtor_tileset);
         } else if (!strcmp (type, "sprite")) {
             item = _al_list_next (tokens, item);
             SPRITE *sprite = al_malloc (sizeof (SPRITE));
@@ -177,9 +188,11 @@ SPRITES* sprite_load_sprites (const char *filename)
             }
 
             sprites->sprites = aa_insert (sprites->sprites, sprite->name, sprite, charcmp);
+            _al_list_push_back_ex (sprites->sprites_list, sprite, dtor_sprite);
         }
 
         section = al_get_next_config_section (&it);
+        _al_list_destroy (tokens);
     } while (section);
 
     al_destroy_config (sprite_config);
@@ -472,7 +485,7 @@ LIST *sprite_load_npcs (SPRITES *sprites, TILED_MAP *map, const char *layer_name
                     break;
             }
 
-            _al_list_push_back_ex (npcs, npc, dtor_actor);
+            _al_list_push_back_ex (npcs, npc, sprite_free_actor);
             item = _al_list_next (layer->objects, item);
         }
     }

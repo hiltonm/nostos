@@ -194,11 +194,15 @@ static inline void process_node (AUX_NODE *node, VECTOR *auxnodes, int max_depth
     else
         node->right = -1;
 
-    if (left)
+    if (left) {
         vector_add (auxnodes, left);
+        al_free (left);
+    }
 
-    if (right)
+    if (right) {
         vector_add (auxnodes, right);
+        al_free (right);
+    }
 }
 
 AABB_TREE *aabb_build_tree (BOX *boxes, int num_boxes, int max_depth)
@@ -216,7 +220,7 @@ AABB_TREE *aabb_build_tree (BOX *boxes, int num_boxes, int max_depth)
 
     vector_add (&auxnodes, auxnode);
 
-    //free (auxnode);
+    al_free (auxnode);
     auxnode = NULL;
     int size = _al_vector_size (&auxnodes);
 
@@ -307,7 +311,12 @@ AABB_TREE *aabb_build_tree (BOX *boxes, int num_boxes, int max_depth)
         }
     }
 
-    free (ln);
+    for (int i = 0; i < size; i++) {
+        auxnode = _al_vector_ref (&auxnodes, i);
+        _al_vector_free (&auxnode->boxes);
+    }
+
+    al_free (ln);
     _al_vector_free (&auxnodes);
 
     return tree;
@@ -482,9 +491,13 @@ void aabb_free (AABB_TREE *tree)
     if (!tree)
         return;
 
-    free (tree->root);
-    free (tree->leafs);
-    free (tree);
+    al_free (tree->root);
+
+    for (int i = 0; i < tree->num_leafs; i++)
+        al_free (tree->leafs[i].boxes);
+
+    al_free (tree->leafs);
+    al_free (tree);
 }
 
 void aabb_free_collisions (AABB_COLLISIONS *col)
