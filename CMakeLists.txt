@@ -17,10 +17,6 @@ set(PROJECT_VERSION ${NOSTOS_VERSION_MAJOR}.${NOSTOS_VERSION_MINOR}.${NOSTOS_VER
 # Search in the 'cmake' directory for additional CMake modules.
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-# Environment tests
-# =================
-
-#None
 
 # Build options
 # =============
@@ -97,6 +93,7 @@ add_library(nostos
 
 set_target_properties(nostos PROPERTIES
     VERSION ${PROJECT_VERSION}
+    SOVERSION ${NOSTOS_VERSION_MAJOR}
 )
 
 # Build Examples
@@ -125,10 +122,3 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/nostos
         DESTINATION include
 )
 
-install(TARGETS nostos-demo1
-    RUNTIME DESTINATION opt/nostos
-)
-
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/data
-        DESTINATION opt/nostos
-)
