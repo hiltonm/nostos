@@ -149,7 +149,7 @@ GAME * game_init ()
     al_set_render_state (ALLEGRO_ALPHA_FUNCTION, ALLEGRO_RENDER_EQUAL);
     al_set_render_state (ALLEGRO_ALPHA_TEST_VALUE, 1);
 
-    char *filename = get_resource_path_str ("data/chars.ini");
+    char *filename = get_resource_path_str ("data/sprites.ini");
     game->sprites = sprite_load_sprites (filename);
     al_free (filename);
 
