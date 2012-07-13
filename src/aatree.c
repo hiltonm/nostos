@@ -11,6 +11,9 @@
  *      AA tree, a type of self-balancing search tree.
  *
  *      By Peter Wang.
+ *      see LICENSE for copyright information.
+ *
+ *      Modified to remove allegro prefixes.
  */
 
 
