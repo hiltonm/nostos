@@ -46,6 +46,7 @@ include_directories(${ALLEGRO_INCLUDE_DIR})
 list(APPEND LINK_LIBS ${ALLEGRO_LIBRARY})
 list(APPEND LINK_LIBS ${ALLEGRO_IMAGE_LIBRARY})
 list(APPEND LINK_LIBS ${ALLEGRO_FONT_LIBRARY})
+list(APPEND LINK_LIBS ${ALLEGRO_TTF_LIBRARY})
 list(APPEND LINK_LIBS ${ALLEGRO_PRIMITIVES_LIBRARY})
 
 find_package(LIBXML2 REQUIRED)
@@ -66,6 +67,7 @@ list(APPEND NOSTOS_SRC_FILES
     ${PROJECT_SOURCE_DIR}/src/screen.c
     ${PROJECT_SOURCE_DIR}/src/sprite.c
     ${PROJECT_SOURCE_DIR}/src/tiled.c
+    ${PROJECT_SOURCE_DIR}/src/ui.c
     ${PROJECT_SOURCE_DIR}/src/utils.c
     ${PROJECT_SOURCE_DIR}/src/vector2d.c
 )
@@ -78,6 +80,7 @@ list(APPEND NOSTOS_HDR_FILES
     ${PROJECT_SOURCE_DIR}/include/nostos/screen.h
     ${PROJECT_SOURCE_DIR}/include/nostos/sprite.h
     ${PROJECT_SOURCE_DIR}/include/nostos/tiled.h
+    ${PROJECT_SOURCE_DIR}/include/nostos/ui.h
     ${PROJECT_SOURCE_DIR}/include/nostos/utils.h
     ${PROJECT_SOURCE_DIR}/include/nostos/vector2d.h
 )

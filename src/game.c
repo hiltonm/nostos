@@ -6,6 +6,7 @@
 
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_primitives.h>
 
 #include "nostos/vector2d.h"
@@ -13,6 +14,7 @@
 #include "nostos/sprite.h"
 #include "nostos/aabbtree.h"
 #include "nostos/screen.h"
+#include "nostos/ui.h"
 #include "nostos/utils.h"
 
 #include <stdio.h>
@@ -25,26 +27,32 @@
 
 GAME * game_init ()
 {
-    if (!al_init()) {
-        fprintf(stderr, "Failed to initialize allegro.\n");
+    if (!al_init ()) {
+        fprintf (stderr, "Failed to initialize Allegro.\n");
         return NULL;
     }
 
     if (!al_init_image_addon ()) {
-        fprintf(stderr, "Failed to initialize image addon.\n");
+        fprintf (stderr, "Failed to initialize image addon.\n");
         return NULL;
     }
 
     if (!al_install_keyboard ()) {
-        fprintf(stderr, "Failed to install keyboard.\n");
+        fprintf (stderr, "Failed to install keyboard.\n");
         return NULL;
     }
 
-    al_set_org_name ("nostos");
-    al_set_app_name ("demo1");
-
     al_init_font_addon ();
-    al_init_primitives_addon ();
+
+    if (!al_init_ttf_addon ()) {
+        fprintf (stderr, "Failed to initialize ttf addon.\n");
+        return NULL;
+    }
+
+    if (!al_init_primitives_addon ()) {
+        fprintf (stderr, "Failed to initialize primitives addon.\n");
+        return NULL;
+    }
 
     GAME *game = al_malloc (sizeof (GAME));
     if (!game)
@@ -63,7 +71,18 @@ GAME * game_init ()
 
     game->screen = screen_new ();
 
-    ALLEGRO_PATH *respath = al_get_standard_path (ALLEGRO_RESOURCES_PATH);
+    char *filename;
+    const char *str;
+
+    filename = get_resource_path_str ("data/game.ini");
+    ALLEGRO_CONFIG *game_config = al_load_config_file (filename);
+    al_free (filename);
+
+    str = al_get_config_value (game_config, "", "org");
+    al_set_org_name (str);
+    str = al_get_config_value (game_config, "", "app");
+    al_set_app_name (str);
+
     ALLEGRO_PATH *settpath = al_get_standard_path (ALLEGRO_USER_SETTINGS_PATH);
     ALLEGRO_PATH *gcpath = al_clone_path (settpath);
 
@@ -95,7 +114,6 @@ GAME * game_init ()
 
     al_save_config_file (gcpath_str, gconfig);
 
-    al_destroy_path (respath);
     al_destroy_path (settpath);
     al_destroy_path (gcpath);
     al_destroy_config (gconfig);
@@ -149,7 +167,7 @@ GAME * game_init ()
     al_set_render_state (ALLEGRO_ALPHA_FUNCTION, ALLEGRO_RENDER_EQUAL);
     al_set_render_state (ALLEGRO_ALPHA_TEST_VALUE, 1);
 
-    char *filename = get_resource_path_str ("data/sprites.ini");
+    filename = get_resource_path_str ("data/sprites.ini");
     game->sprites = sprite_load_sprites (filename);
     al_free (filename);
 
@@ -158,19 +176,19 @@ GAME * game_init ()
     scene_load_scenes (game->scenes, game->sprites);
     al_free (filename);
 
-    filename = get_resource_path_str ("data/entry.ini");
-    ALLEGRO_CONFIG *config = al_load_config_file (filename);
-
-    const char *str = al_get_config_value (config, "", "scene");
+    str = al_get_config_value (game_config, "", "scene");
     game->current_scene = scene_get (game->scenes, str);
 
-    str = al_get_config_value (config, "", "actor");
+    str = al_get_config_value (game_config, "", "actor");
     game->current_actor = sprite_new_actor (game->sprites, str);
-    str = al_get_config_value (config, "", "portal");
+    str = al_get_config_value (game_config, "", "portal");
     SCENE_PORTAL *portal = scene_get_portal (game->scenes, str);
 
+    al_destroy_config (game_config);
+
+    filename = get_resource_path_str ("data/ui.ini");
+    game->ui = ui_load_file (filename);
     al_free (filename);
-    al_destroy_config (config);
 
     sprite_center (game->current_actor, &portal->position);
     screen_center (&game->screen, portal->position, game->current_scene->map);
@@ -271,6 +289,7 @@ void game_loop (GAME *game)
                                  game->screen.position.x, game->screen.position.y,
                                  game->screen.width, game->screen.height, 0, 0, 0);
 
+            ui_draw (game->ui, &game->screen);
             if (game->force_vsync)
                 al_wait_for_vsync ();
 
@@ -331,6 +350,10 @@ void game_loop (GAME *game)
                     continue;
                 }
 
+                if (al_key_down (&keyboard_state, ALLEGRO_KEY_ENTER)) {
+                    ui_show_dialog (game->ui, NULL, NULL);
+                }
+
                 if (al_key_down (&keyboard_state, ALLEGRO_KEY_RIGHT)) {
                     actor->event->move_right (actor, dt);
                 }
@@ -373,6 +396,7 @@ void game_loop (GAME *game)
                                 fadeout_duration = TRANS_TIME;
                                 game->paused = true;
                                 actor->movement = (VECTOR2D){0, 0};
+                                ui_show_dialog_cstr (game->ui, "Speaker:", "Entering portal");
                                 break;
                             }
                         }

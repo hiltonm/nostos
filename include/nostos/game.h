@@ -8,6 +8,7 @@
 #include "sprite.h"
 #include "scene.h"
 #include "screen.h"
+#include "ui.h"
 
 #include <allegro5/allegro.h>
 
@@ -17,6 +18,7 @@ typedef struct GAME {
     SPRITES *sprites;
     SPRITE_ACTOR *current_actor;
     SCREEN screen;
+    UI *ui;
 
     ALLEGRO_DISPLAY	*display;
     ALLEGRO_EVENT_QUEUE	*event_queue;
