@@ -40,7 +40,7 @@ static inline int classify_aabb (BOX *box, int axis, int middle)
 static inline void aabb_debug_auxnode (AUX_NODE *node)
 {
     debug ("AuxNode");
-    box_debug (&node->aabb);
+    box_debug (node->aabb);
     debug ("Left: %d, Right: %d", node->left, node->right);
 }
 
@@ -72,7 +72,7 @@ static inline void process_node (AUX_NODE *node, VECTOR *auxnodes, int max_depth
     }
 
     node->aabb = box_from_points (bmin, bmax);
-    box_debug (&node->aabb);
+    box_debug (node->aabb);
 
     VECTOR2D center = node->aabb.center;
     VECTOR2D ext = node->aabb.extent;
@@ -119,7 +119,7 @@ static inline void process_node (AUX_NODE *node, VECTOR *auxnodes, int max_depth
                     left->aabb = box_from_points (bboxmin, (VECTOR2D){(bboxmin.x + bboxmax.x) / 2.0f, bboxmax.y});
                 else
                     left->aabb = box_from_points (bboxmin, (VECTOR2D){bboxmax.x, (bboxmin.y + bboxmax.y) / 2.0f});
-                box_debug (&left->aabb);
+                box_debug (left->aabb);
             }
             BOX aabb = left->aabb;
             if (axis == 0 && max > (aabb.center.x + aabb.extent.x))
@@ -127,7 +127,7 @@ static inline void process_node (AUX_NODE *node, VECTOR *auxnodes, int max_depth
             else if (axis == 1 && max > (aabb.center.y + aabb.extent.y))
                 left->aabb = box_from_points (bboxmin, (VECTOR2D){bboxmax.x, max});
             debug ("Final");
-            box_debug (&left->aabb);
+            box_debug (left->aabb);
             vector_add (&left->boxes, box);
         }
         else {
@@ -139,7 +139,7 @@ static inline void process_node (AUX_NODE *node, VECTOR *auxnodes, int max_depth
                     right->aabb = box_from_points ((VECTOR2D){(bboxmin.x + bboxmax.x) / 2.0f, bboxmin.y}, bboxmax);
                 else
                     right->aabb = box_from_points ((VECTOR2D){bboxmin.x, (bboxmin.y + bboxmax.y) / 2.0f}, bboxmax);
-                box_debug (&right->aabb);
+                box_debug (right->aabb);
             }
             BOX aabb = right->aabb;
             if (axis == 0 && min < (aabb.center.x - aabb.extent.x))
@@ -147,7 +147,7 @@ static inline void process_node (AUX_NODE *node, VECTOR *auxnodes, int max_depth
             else if (axis == 1 && min < (aabb.center.y - aabb.extent.y))
                 right->aabb = box_from_points ((VECTOR2D){bboxmin.x, min}, bboxmax);
             debug ("Final");
-            box_debug (&right->aabb);
+            box_debug (right->aabb);
             vector_add (&right->boxes, box);
         }
     }
@@ -261,7 +261,7 @@ AABB_TREE *aabb_build_tree (BOX *boxes, int num_boxes, int max_depth)
             debug ("New leaf");
             leaf->node.aabb = auxnode->aabb;
             debug ("AABB");
-            box_debug (&leaf->node.aabb);
+            box_debug (leaf->node.aabb);
             leaf->node.left = NULL;
             leaf->node.right = NULL;
             leaf->num_boxes = _al_vector_size (&auxnode->boxes);
@@ -270,7 +270,7 @@ AABB_TREE *aabb_build_tree (BOX *boxes, int num_boxes, int max_depth)
             for (int j = 0; j < leaf->num_boxes; j++) {
                 BOX *box = &leaf->boxes[j];
                 *box = *(BOX *)_al_vector_ref (&auxnode->boxes, j);
-                box_debug (&leaf->boxes[j]);
+                box_debug (leaf->boxes[j]);
             }
         } else {
             int i_node = ln[i];
@@ -278,7 +278,7 @@ AABB_TREE *aabb_build_tree (BOX *boxes, int num_boxes, int max_depth)
             debug ("New node");
             node->aabb = auxnode->aabb;
             debug ("AABB");
-            box_debug (&node->aabb);
+            box_debug (node->aabb);
 
             if (auxnode->left != -1) {
                 debug ("Left OK");
@@ -350,10 +350,6 @@ AABB_TREE *aabb_load_tree (TILED_MAP *map, const char *layer_name)
         }
     }
 
-    for (int i = 0; i < num_boxes; i++) {
-        box_debug (&boxes[i]);
-    }
-
     if (boxes) {
         AABB_TREE *tree = aabb_build_tree (boxes, num_boxes, MIN (num_boxes - 1, 4));
         tree->use_cache = false;
@@ -367,13 +363,13 @@ AABB_TREE *aabb_load_tree (TILED_MAP *map, const char *layer_name)
 
 bool collide (AABB_TREE *tree, AABB_NODE *node, BOX *box)
 {
-    if (box_overlap (&node->aabb, box)) {
+    if (box_overlap (node->aabb, *box)) {
         if (!node->left && !node->right) {
             AABB_LEAF *leaf = (AABB_LEAF*)node;
             for (int i = 0; i < leaf->num_boxes; i++) {
                 BOX *leaf_box = &leaf->boxes[i];
 
-                bool overlap = box_overlap (box, leaf_box);
+                bool overlap = box_overlap (*box, *leaf_box);
                 if (overlap) {
                     tree->num_collisions++;
                     if (tree->collisions)
@@ -398,13 +394,13 @@ bool collide (AABB_TREE *tree, AABB_NODE *node, BOX *box)
 
 void collide_fill (AABB_TREE *tree, AABB_NODE *node, BOX *box)
 {
-    if (box_overlap (&node->aabb, box)) {
+    if (box_overlap (node->aabb, *box)) {
         if (!node->left && !node->right) {
             AABB_LEAF *leaf = (AABB_LEAF*)node;
             for (int i = 0; i < leaf->num_boxes; i++) {
                 BOX *leaf_box = &leaf->boxes[i];
 
-                bool overlap = box_overlap (box, leaf_box);
+                bool overlap = box_overlap (*box, *leaf_box);
                 if (overlap) {
                     tree->num_collisions++;
                     if (tree->collisions)
@@ -445,7 +441,7 @@ bool aabb_collide_with_cache (AABB_TREE *tree, BOX *box, AABB_COLLISIONS *collis
 
     if (tree->use_cache && !_al_list_is_empty (collisions->boxes)) {
         LIST_ITEM *item = _al_list_front (collisions->boxes);
-        if (box_overlap (box, (BOX*)_al_list_item_data (item))) {
+        if (box_overlap (*box, *(BOX*)_al_list_item_data (item))) {
             tree->num_collisions = 1;
             return true;
         }
@@ -468,7 +464,7 @@ void aabb_collide_fill_cache (AABB_TREE *tree, BOX *box, AABB_COLLISIONS *collis
 
     if (tree->use_cache && !_al_list_is_empty (collisions->boxes)) {
         LIST_ITEM *item = _al_list_front (collisions->boxes);
-        if (box_overlap (box, (BOX*)_al_list_item_data (item))) {
+        if (box_overlap (*box, *(BOX*)_al_list_item_data (item))) {
             tree->num_collisions = 1;
             return;
         }
@@ -509,7 +505,7 @@ void aabb_draw_node (AABB_NODE *node, SCREEN *s, ALLEGRO_COLOR color)
     if (!node)
         return;
 
-    box_draw (&node->aabb, s->position, color);
+    box_draw (node->aabb, s->position, color);
     aabb_draw_node (node->left, s, color);
     aabb_draw_node (node->right, s, color);
 }
