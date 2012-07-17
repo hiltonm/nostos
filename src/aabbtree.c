@@ -62,8 +62,8 @@ static inline void process_node (AUX_NODE *node, VECTOR *auxnodes, int max_depth
 
     for (int i = 0; i < size; i++) {
         BOX *box = _al_vector_ref (&node->boxes, i);
-        VECTOR2D left = vsub (&box->center, &box->extent);
-        VECTOR2D right = vadd (&box->center, &box->extent);
+        VECTOR2D left = vsub (box->center, box->extent);
+        VECTOR2D right = vadd (box->center, box->extent);
         if (left.x < bmin.x) bmin.x = left.x;
         if (left.y < bmin.y) bmin.y = left.y;
 
@@ -86,13 +86,13 @@ static inline void process_node (AUX_NODE *node, VECTOR *auxnodes, int max_depth
         middle = center.y;
     }
 
-    VECTOR2D bboxmin = vsub (&center, &ext);
-    VECTOR2D bboxmax = vadd (&center, &ext);
+    VECTOR2D bboxmin = vsub (center, ext);
+    VECTOR2D bboxmax = vadd (center, ext);
 
     debug ("BBox Min");
-    vdebug (&bboxmin);
+    vdebug (bboxmin);
     debug ("BBox Max");
-    vdebug (&bboxmax);
+    vdebug (bboxmax);
 
     AUX_NODE *left = NULL;
     AUX_NODE *right = NULL;
@@ -509,7 +509,7 @@ void aabb_draw_node (AABB_NODE *node, SCREEN *s, ALLEGRO_COLOR color)
     if (!node)
         return;
 
-    box_draw (&node->aabb, s, color);
+    box_draw (&node->aabb, s->position, color);
     aabb_draw_node (node->left, s, color);
     aabb_draw_node (node->right, s, color);
 }

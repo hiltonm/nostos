@@ -14,11 +14,8 @@
 BOX box_from_points (VECTOR2D v1, VECTOR2D v2)
 {
     BOX box;
-    box.center = vadd (&v2, &v1);
-    box.extent = vsub (&v2, &v1);
-    vatmulf (&box.center, 0.5f);
-    vatmulf (&box.extent, 0.5f);
-    vabs (&box.extent);
+    box.center = vabs (vmulf (vadd (v2, v1), 0.5f));
+    box.extent = vabs (vmulf (vsub (v2, v1), 0.5f));
     return box;
 }
 
@@ -26,10 +23,8 @@ bool box_overlap (BOX *b1, BOX *b2)
 {
     assert (b1);
     assert (b2);
-    VECTOR2D t = vsub (&b1->center, &b2->center);
-    vabs (&t);
-
-    VECTOR2D ext = vadd (&b1->extent, &b2->extent);
+    VECTOR2D t = vabs (vsub (b1->center, b2->center));
+    VECTOR2D ext = vadd (b1->extent, b2->extent);
     return t.x <= ext.x && t.y <= ext.y;
 }
 
@@ -59,13 +54,13 @@ bool box_inside_box (BOX *b1, BOX *b2)
 VECTOR2D box_get_min (BOX *b)
 {
     assert (b);
-    return vsub (&b->center, &b->extent);
+    return vsub (b->center, b->extent);
 }
 
 VECTOR2D box_get_max (BOX *b)
 {
     assert (b);
-    return vadd (&b->center, &b->extent);
+    return vadd (b->center, b->extent);
 }
 
 void box_debug (BOX *b)
@@ -74,14 +69,11 @@ void box_debug (BOX *b)
     debug ("Box center (%f, %f), extent (%f, %f)", b->center.x, b->center.y, b->extent.x, b->extent.y);
 }
 
-void box_draw (BOX *b, SCREEN *s, ALLEGRO_COLOR color)
+void box_draw (BOX *b, VECTOR2D offset, ALLEGRO_COLOR color)
 {
     assert (b);
-    assert (s);
-    VECTOR2D bmin = box_get_min (b);
-    VECTOR2D bmax = box_get_max (b);
-    vatsub (&bmin, &s->position);
-    vatsub (&bmax, &s->position);
+    VECTOR2D bmin = vsub (box_get_min (b), offset);
+    VECTOR2D bmax = vsub (box_get_max (b), offset);
     al_draw_rectangle (bmin.x, bmin.y, bmax.x, bmax.y, color, 2);
 }
 

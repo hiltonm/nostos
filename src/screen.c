@@ -75,3 +75,11 @@ void screen_center (SCREEN *screen, VECTOR2D focus, TILED_MAP *map)
     screen->movement = (VECTOR2D){0.0f, 0.0f};
 }
 
+BOX screen_box (SCREEN *screen)
+{
+    BOX box;
+    box.extent = (VECTOR2D){screen->width / 2.0f, screen->height / 2.0f};
+    box.center = (VECTOR2D){screen->position.x + box.extent.x, screen->position.y + box.extent.y};
+    return box;
+}
+

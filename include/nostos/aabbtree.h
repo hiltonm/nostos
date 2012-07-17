@@ -5,7 +5,7 @@
 #ifndef _aabbtree_h
 #define _aabbtree_h
 
-#include "box.h"
+#include "screen.h"
 #include "tiled.h"
 #include "utils.h"
 

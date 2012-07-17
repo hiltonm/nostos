@@ -228,8 +228,8 @@ SPRITE_ACTOR *sprite_init_actor (SPRITES *sprites, SPRITE_ACTOR *actor, const ch
 {
     assert (actor);
     actor->sprite = aa_search (sprites->sprites, sprite, charcmp);
-    actor->box.extent = vdivf (&actor->sprite->box.extent, 2.0);
-    actor->box.center = vadd (&actor->position, &actor->sprite->box.center);
+    actor->box.extent = vdivf (actor->sprite->box.extent, 2.0);
+    actor->box.center = vadd (actor->position, actor->sprite->box.center);
     return actor;
 }
 
@@ -270,7 +270,7 @@ void sprite_move_to (void *sprite, float x, float y, float dt)
     VECTOR2D delta;
     delta.x = x - actor->position.x;
     delta.y = y - actor->position.y;
-    vnormalize (&delta);
+    delta = vnormalize (delta);
     actor->movement.x = delta.x * actor->movement_max;
     actor->movement.y = delta.y * actor->movement_max;
 }
@@ -292,11 +292,10 @@ static inline VECTOR2D sprite_next_point (SPRITE_NPC *npc)
     return (VECTOR2D) {npc->points[npc->next_point], npc->points[npc->next_point + 1]};
 }
 
-static inline bool sprite_point_is_equal (SPRITE_ACTOR *actor, VECTOR2D *v1, VECTOR2D *v2, float dt)
+static inline bool sprite_point_is_equal (SPRITE_ACTOR *actor, VECTOR2D v1, VECTOR2D v2, float dt)
 {
-    VECTOR2D diff = vsub (v1, v2);
+    VECTOR2D diff = vabs (vsub (v1, v2));
     float limit = dt * actor->movement_max;
-    vabs (&diff);
 
     return (diff.x < limit && diff.y < limit);
 }
@@ -370,7 +369,7 @@ void sprite_update (SPRITE_ACTOR *actor, float dt, float t)
                 if (sprite_is_paused (npc, t))
                     break;
 
-                if (sprite_point_is_equal (actor, &actor->position, &next_point, dt)) {
+                if (sprite_point_is_equal (actor, actor->position, next_point, dt)) {
                     npc->current_point = npc->next_point;
                     actor->movement = (VECTOR2D){0, 0};
 
@@ -389,7 +388,7 @@ void sprite_update (SPRITE_ACTOR *actor, float dt, float t)
                 if (sprite_is_paused (npc, t))
                     break;
 
-                if (sprite_point_is_equal (actor, &actor->position, &next_point, dt)) {
+                if (sprite_point_is_equal (actor, actor->position, next_point, dt)) {
                     npc->current_point = npc->next_point;
                     npc->next_point = 2 * (rand () % ((npc->num_points / 2) - 1));
                     actor->movement = (VECTOR2D){0, 0};
@@ -497,7 +496,7 @@ void sprite_center (SPRITE_ACTOR *actor, VECTOR2D *v)
 {
     actor->position = *v;
     VECTOR2D dim = {actor->sprite->tileset->tile_width * 0.5f, actor->sprite->tileset->tile_height * 0.5f};
-    vatsub (&actor->position, &dim);
-    actor->box.center = vadd (&actor->position, &actor->sprite->box.center);
+    actor->position = vsub (actor->position, dim);
+    actor->box.center = vadd (actor->position, actor->sprite->box.center);
 }
 

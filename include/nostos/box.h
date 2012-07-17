@@ -6,8 +6,8 @@
 #define _box_h_
 
 #include "vector2d.h"
-#include "screen.h"
 
+#include <allegro5/allegro.h>
 #include <stdbool.h>
 
 typedef struct BOX {
@@ -23,7 +23,7 @@ bool box_inside_box (BOX *b1, BOX *b2);
 VECTOR2D box_get_min (BOX *b);
 VECTOR2D box_get_max (BOX *b);
 void box_debug (BOX *b);
-void box_draw (BOX *b, SCREEN *screen, ALLEGRO_COLOR color);
+void box_draw (BOX *b, VECTOR2D offset, ALLEGRO_COLOR color);
 bool box_lateral (BOX *b1, BOX *b2);
 
 #endif
