@@ -41,8 +41,10 @@ int intcmp (const void *a, const void *b);
 int charcmp (const void *a, const void *b);
 
 void dtor_string (void *value, void *user_data);
+void dtor_ustr (void *value, void *user_data);
 
 LIST * split (const char *str, const char *delimiters);
+LIST * split_line (const ALLEGRO_USTR* ustr, int max_chars, int32_t c);
 
 ALLEGRO_PATH* get_resource_path (const char *filename);
 char* get_resource_path_str (const char *filename);

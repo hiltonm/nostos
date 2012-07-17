@@ -73,8 +73,14 @@ int charcmp (const void *a, const void *b)
 
 void dtor_string (void *value, void *user_data)
 {
-    char *str = (char *)value;
+    char *str = value;
     free (str);
+}
+
+void dtor_ustr (void *value, void *user_data)
+{
+    ALLEGRO_USTR *ustr = value;
+    al_ustr_free (ustr);
 }
 
 LIST * split (const char *str, const char *delimiters)
@@ -90,6 +96,38 @@ LIST * split (const char *str, const char *delimiters)
 
     free (cstr);
     return tokens;
+}
+
+LIST * split_line (const ALLEGRO_USTR* ustr, int max_chars, int32_t c)
+{
+    int length = al_ustr_length (ustr);
+    LIST *list = _al_list_create ();
+    int start_pos = 0;
+
+    if (length < max_chars) {
+        _al_list_push_back_ex (list, al_ustr_dup (ustr), dtor_ustr);
+        return list;
+    }
+
+    int end_pos = max_chars;
+
+    while (length > end_pos) {
+        end_pos = al_ustr_rfind_chr (ustr, al_ustr_offset (ustr, end_pos), c);
+        _al_list_push_back_ex (list, al_ustr_dup_substr (ustr,
+                                                         al_ustr_offset (ustr, start_pos),
+                                                         al_ustr_offset (ustr, end_pos)),
+                                                         dtor_ustr);
+        start_pos = end_pos + 1;
+        end_pos += max_chars;
+    }
+
+    if (start_pos < length - 1)
+        _al_list_push_back_ex (list, al_ustr_dup_substr (ustr,
+                                                         al_ustr_offset (ustr, start_pos),
+                                                         al_ustr_offset (ustr, length - 1)),
+                                                         dtor_ustr);
+
+    return list;
 }
 
 ALLEGRO_PATH* get_resource_path (const char *filename)

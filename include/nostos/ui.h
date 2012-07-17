@@ -27,6 +27,7 @@ struct UI_DIALOG {
     ALLEGRO_USTR *speaker;
     ALLEGRO_COLOR speaker_color;
     ALLEGRO_USTR *text;
+    LIST *text_lines;
     ALLEGRO_COLOR text_color;
     bool visible;
 };
