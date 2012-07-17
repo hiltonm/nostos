@@ -69,6 +69,16 @@ VECTOR2D vabs (VECTOR2D v)
     return (VECTOR2D) { .x = fabs (v.x), .y = fabs (v.y) };
 }
 
+float vdistance (VECTOR2D v1, VECTOR2D v2)
+{
+    return vlen (vsub (v1, v2));
+}
+
+float vsqdistance (VECTOR2D v1, VECTOR2D v2)
+{
+    return vsqlen (vsub (v1, v2));
+}
+
 void vdebug (VECTOR2D v)
 {
     debug ("Vector2D x: %f, y: %f", v.x, v.y);

@@ -20,6 +20,8 @@ float vlen (VECTOR2D v);
 float vdot (VECTOR2D v1, VECTOR2D v2);
 VECTOR2D vnormalize (VECTOR2D v);
 VECTOR2D vabs (VECTOR2D v);
+float vdistance (VECTOR2D v1, VECTOR2D v2);
+float vsqdistance (VECTOR2D v1, VECTOR2D v2);
 void vdebug (VECTOR2D v);
 
 #endif
