@@ -19,6 +19,12 @@ BOX box_from_points (VECTOR2D v1, VECTOR2D v2)
     return box;
 }
 
+BOX box_scale (BOX b, float f)
+{
+    b.extent = vmulf (b.extent, f);
+    return b;
+}
+
 bool box_overlap (BOX b1, BOX b2)
 {
     VECTOR2D t = vabs (vsub (b1.center, b2.center));
