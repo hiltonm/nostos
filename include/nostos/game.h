@@ -17,6 +17,7 @@ typedef struct GAME {
     SCENE *current_scene;
     SPRITES *sprites;
     SPRITE_ACTOR *current_actor;
+    SPRITE_NPC *current_npc;
     SCREEN screen;
     UI *ui;
 

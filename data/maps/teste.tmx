@@ -70087,10 +70087,11 @@
    </properties>
    <polyline points="0,0 0,128 32,288 -64,320 -160,416"/>
   </object>
-  <object x="880" y="872">
+  <object name="soldier01" x="880" y="872">
    <properties>
     <property name="action" value="move"/>
     <property name="char" value="soldier"/>
+    <property name="name" value="Soldier"/>
    </properties>
    <polyline points="0,0 -1,70 377,69 427,21 529,13 673,-103 674,-176"/>
   </object>

@@ -79,6 +79,19 @@ SCENE *scene_load (SCENE *scene, SCENES *scenes, SPRITES *sprites)
     char *layer_name = scene->npc_layer_name ? scene->npc_layer_name : "npc";
     scene->npcs = sprite_load_npcs (sprites, scene->map, layer_name);
 
+    int size = _al_list_size (scene->npcs);
+    BOX *boxes = al_malloc (size * sizeof (BOX));
+    LIST_ITEM *item = _al_list_front (scene->npcs);
+    int i = 0;
+    while (item) {
+        SPRITE_NPC *npc = _al_list_item_data (item);
+        boxes[i] = box_scale (npc->actor.box, 5.0f);
+        boxes[i++].data = npc;
+        item = _al_list_next (scene->npcs, item);
+    }
+    scene->npc_tree = aabb_build_tree (boxes, size, 4);
+    al_free (boxes);
+
     layer_name = scene->collision_layer_name ? scene->collision_layer_name : "collision";
     scene->collision_tree = aabb_load_tree (scene->map, layer_name);
 

@@ -69,6 +69,8 @@ GAME * game_init ()
     game->suggest_vsync = 1;
     game->force_vsync = 0;
 
+    game->current_npc = NULL;
+
     game->screen = screen_new ();
 
     char *filename;
@@ -230,6 +232,9 @@ void game_loop (GAME *game)
     AABB_COLLISIONS portal_collisions;
     aabb_init_collisions (&portal_collisions);
 
+    AABB_COLLISIONS npc_collisions;
+    aabb_init_collisions (&npc_collisions);
+
     int i = 0;
     bool redraw = true;
     float times[NTIMES] = {0};
@@ -244,6 +249,9 @@ void game_loop (GAME *game)
     float fadeout_duration = 0;
     float fadein_duration = 0;
     SCENE_PORTAL *dest_portal = NULL;
+
+    char *arrow_path = get_resource_path_str ("data/ui/smallarrow_down.png");
+    ALLEGRO_BITMAP *sel_arrow = al_load_bitmap (arrow_path);
 
     while (game->running) {
         scene = game->current_scene;
@@ -278,7 +286,7 @@ void game_loop (GAME *game)
                 item = _al_list_front (portal_collisions.boxes);
                 while (item) {
                     BOX *box = _al_list_item_data (item);
-                    box_draw (box, &game->screen, al_map_rgb_f (1, 0, 0));
+                    box_draw (*box, game->screen.position, al_map_rgb_f (1, 0, 0));
                     item = _al_list_next (portal_collisions.boxes, item);
                 }
 
@@ -288,6 +296,14 @@ void game_loop (GAME *game)
             tiled_draw_map_fore (scene->map, game->screen.tint,
                                  game->screen.position.x, game->screen.position.y,
                                  game->screen.width, game->screen.height, 0, 0, 0);
+
+            if (game->current_npc) {
+                float dx = game->current_npc->actor.box.center.x - game->screen.position.x;
+                float dy = game->current_npc->actor.box.center.y - game->screen.position.y;
+                dx -= al_get_bitmap_width (sel_arrow) * 0.5f;
+                dy -= game->current_npc->actor.box.extent.y * 3.0f;
+                al_draw_bitmap (sel_arrow, dx, dy, 0);
+            }
 
             ui_draw (game->ui, &game->screen);
             if (game->force_vsync)
@@ -375,7 +391,7 @@ void game_loop (GAME *game)
                 if (scene->collision_tree->num_collisions > 0) {
                     item = _al_list_front (collisions.boxes);
                     while (item) {
-                        if (box_lateral ((BOX *)_al_list_item_data (item), &actor->box))
+                        if (box_lateral (*(BOX *)_al_list_item_data (item), actor->box))
                             actor->movement.x = 0;
                         else
                             actor->movement.y = 0;
@@ -396,13 +412,44 @@ void game_loop (GAME *game)
                                 fadeout_duration = TRANS_TIME;
                                 game->paused = true;
                                 actor->movement = (VECTOR2D){0, 0};
-                                ui_show_dialog_cstr (game->ui, "Speaker:", "Entering portal");
+                                ui_show_dialog_cstr (game->ui, "Speaker:", "Entering portal.");
                                 break;
                             }
                         }
                         item = _al_list_next (portal_collisions.boxes, item);
                     }
                 }
+
+                box = screen_box (&game->screen);
+
+                game->current_npc = NULL;
+                item = _al_list_front (scene->npcs);
+                float max_dist = 0;
+                while (item) {
+                    SPRITE_NPC *npc = _al_list_item_data (item);
+                    float dist = vsqdistance (npc->actor.box.center, game->current_actor->box.center);
+                    if (dist < 128.0f * 128.0f && dist > max_dist) {
+                        game->current_npc = npc;
+                        max_dist = dist;
+                    }
+                    item = _al_list_next (scene->npcs, item);
+                }
+
+                //aabb_collide_fill_cache (scene->npc_tree, &box, &npc_collisions);
+                //if (scene->npc_tree->num_collisions > 0) {
+                //    item = _al_list_front (npc_collisions.boxes);
+                //    float max_dist = 0;
+                //    while (item) {
+                //        BOX *colbox = _al_list_item_data (item);
+                //        SPRITE_NPC *npc = colbox->data;
+                //        float dist = vsqdistance (npc->actor.box.center, game->current_actor->box.center);
+                //        if (dist < 128.0f * 128.0f && dist > max_dist) {
+                //            game->current_npc = npc;
+                //            max_dist = dist;
+                //        }
+                //        item = _al_list_next (npc_collisions.boxes, item);
+                //    }
+                //}
 
                 screen_update (&game->screen, actor->position, scene->map, dt);
                 sprite_update (actor, dt, mean_frame_time);
@@ -427,6 +474,7 @@ void game_loop (GAME *game)
 
     aabb_free_collisions (&collisions);
     aabb_free_collisions (&portal_collisions);
+    aabb_free_collisions (&npc_collisions);
 }
 
 void game_destroy (GAME *game)

@@ -25,6 +25,7 @@ struct SCENE {
     LIST *portals;
     AABB_TREE *collision_tree;
     AABB_TREE *portal_tree;
+    AABB_TREE *npc_tree;
 };
 
 struct SCENES {

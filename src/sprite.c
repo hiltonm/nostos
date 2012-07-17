@@ -421,7 +421,7 @@ void sprite_draw (SPRITE_ACTOR *actor, SCREEN *screen)
         {.x = x + w, .y = y,     .z = z, .u = tile->x + w, .v = tile->y,     .color = screen->tint},
     };
     al_draw_prim (v, NULL, actor->sprite->tileset->bitmap, 0, 4, ALLEGRO_PRIM_TRIANGLE_FAN);
-    //box_draw (&actor->box, screen, al_map_rgb_f (1, 1, 1));
+    //box_draw (actor->box, screen->position, al_map_rgb_f (1, 1, 1));
 }
 
 LIST *sprite_load_npcs (SPRITES *sprites, TILED_MAP *map, const char *layer_name)
