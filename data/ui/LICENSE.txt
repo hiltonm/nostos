@@ -1,0 +1,9 @@
+
+Pennomi's UI Elements
+A set of UI Elements in the style of the LPC homepage! They are all supposed to be compatible with Flare's UI set, though it's definitely not a complete reskin.
+
+URL: http://opengameart.org/content/lpc-pennomis-ui-elements
+License: http://creativecommons.org/licenses/by-sa/3.0/
+
+Some are modified and created based on them. See URL for
+the original work.
